@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 
+import { useAppStore } from '../../store/useAppStore';
+
 const pageVariants = {
   initial: { opacity: 0, y: 8 },
   animate: { opacity: 1, y: 0 },
@@ -17,13 +19,19 @@ const pageTransition = {
 
 export const AppLayout = () => {
   const location = useLocation();
+  const theme = useAppStore(state => state.theme);
+
+  React.useEffect(() => {
+    if (theme === 'dark') document.documentElement.classList.add('dark');
+    else document.documentElement.classList.remove('dark');
+  }, [theme]);
 
   return (
-    <div className="flex h-screen bg-[#0a0a0a] text-white overflow-hidden">
+    <div className="flex h-screen bg-[var(--canvas)] text-[var(--ink)] overflow-hidden transition-colors duration-300">
       <Sidebar />
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
         <Header />
-        <main className="flex-1 overflow-y-auto overflow-x-hidden scroll-smooth" style={{ scrollbarWidth: 'thin', scrollbarColor: '#2a2a2a transparent' }}>
+        <main className="flex-1 overflow-y-auto overflow-x-hidden scroll-smooth custom-scrollbar">
           <AnimatePresence mode="wait">
             <motion.div
               key={location.pathname}

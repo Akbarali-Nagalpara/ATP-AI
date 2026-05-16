@@ -20,6 +20,8 @@ export const MOCK_ENDPOINTS = [
   { id: 'e10', method: 'GET',    path: '/api/v1/reports/export',     summary: 'Export test report',    requiresAuth: true,  deprecated: false, tested: true,  passRate: 76,  avgMs: 1200, project: 'Core API' },
   { id: 'e11', method: 'POST',   path: '/api/v1/notifications/send', summary: 'Send notification',     requiresAuth: true,  deprecated: true,  tested: false, passRate: 0,   avgMs: 0,    project: 'Notification Service' },
   { id: 'e12', method: 'GET',    path: '/api/v1/roles',              summary: 'List project roles',    requiresAuth: true,  deprecated: false, tested: true,  passRate: 100, avgMs: 88,   project: 'Auth Gateway' },
+  { id: 'e13', method: 'POST',   path: '/api/v1/auth/send-otp',      summary: 'Send OTP to mobile',    requiresAuth: false, deprecated: false, tested: false, passRate: 0,   avgMs: 0,    project: 'Auth Gateway' },
+  { id: 'e14', method: 'POST',   path: '/api/v1/auth/verify-otp',    summary: 'Verify OTP and login',  requiresAuth: false, deprecated: false, tested: false, passRate: 0,   avgMs: 0,    project: 'Auth Gateway' },
 ];
 
 // ─── TEST RUNS ─────────────────────────────────────────────────────────────

@@ -115,39 +115,6 @@ export interface EndpointParameter {
   description?: string
 }
 
-// ─── Test Run Types ───────────────────────────────────────────────────────────
-export type TestRunStatus = 'pending' | 'running' | 'completed' | 'failed' | 'cancelled'
-
-export interface TestRun {
-  id: string
-  projectId: string
-  status: TestRunStatus
-  totalJobs: number
-  completedJobs: number
-  passedJobs: number
-  failedJobs: number
-  startedAt?: string
-  completedAt?: string
-  createdAt: string
-  triggeredBy: Pick<User, 'id' | 'name'>
-  durationMs?: number
-}
-
-export interface TestResult {
-  id: string
-  runId: string
-  endpointId: string
-  roleId: string
-  endpoint: Pick<Endpoint, 'method' | 'path'>
-  role: Pick<ProjectRole, 'name'>
-  statusCode: number
-  responseTimeMs: number
-  passed: boolean
-  errorMessage?: string
-  requestBody?: unknown
-  responseBody?: unknown
-  headers?: Record<string, string>
-}
 
 // ─── Report Types ─────────────────────────────────────────────────────────────
 export interface Report {
@@ -156,18 +123,9 @@ export interface Report {
   projectId: string
   fileUrl?: string
   summaryText: string
-  aiInsights: AiInsight[]
   coveragePercent: number
   passRate: number
   generatedAt: string
-}
-
-export interface AiInsight {
-  type: 'gap' | 'anomaly' | 'security' | 'recommendation'
-  severity: 'low' | 'medium' | 'high' | 'critical'
-  title: string
-  description: string
-  affectedEndpoints?: string[]
 }
 
 // ─── Spec Import Types ────────────────────────────────────────────────────────
@@ -182,12 +140,3 @@ export interface SpecImportResult {
   warnings: string[]
 }
 
-// ─── Dashboard Stats ──────────────────────────────────────────────────────────
-export interface DashboardStats {
-  totalProjects: number
-  totalRuns: number
-  totalEndpoints: number
-  avgPassRate: number
-  recentRuns: TestRun[]
-  runTrend: { date: string; passed: number; failed: number }[]
-}

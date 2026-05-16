@@ -1,29 +1,32 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { AppLayout } from '../components/layout/AppLayout';
-import { Dashboard } from '../pages/Dashboard/Dashboard';
-import { Projects } from '../pages/Projects/Projects';
-import { Endpoints } from '../pages/Endpoints/Endpoints';
-import { TestRuns } from '../pages/TestRuns/TestRuns';
-import { AIInsights } from '../pages/AIInsights/AIInsights';
-import { Reports } from '../pages/Reports/Reports';
-import { Logs } from '../pages/Logs/Logs';
-import { Workers } from '../pages/Workers/Workers';
-import { Settings } from '../pages/Settings/Settings';
+import { ProjectsList } from '../pages/Projects/ProjectsList';
+import { ProjectDetails } from '../pages/Projects/ProjectDetails';
+import { ReportsList } from '../pages/Reports/ReportsList';
+import { ReportDetails } from '../pages/Reports/ReportDetails';
+import { ErrorPage } from '../pages/ErrorPage';
+import { Login } from '../pages/Auth/Login';
+import { Signup } from '../pages/Auth/Signup';
 
 export const router = createBrowserRouter([
   {
     path: '/',
     element: <AppLayout />,
+    errorElement: <ErrorPage />,
     children: [
-      { index: true,             element: <Dashboard />  },
-      { path: 'projects',        element: <Projects />   },
-      { path: 'endpoints',       element: <Endpoints />  },
-      { path: 'test-runs',       element: <TestRuns />   },
-      { path: 'ai-insights',     element: <AIInsights /> },
-      { path: 'reports',         element: <Reports />    },
-      { path: 'logs',            element: <Logs />       },
-      { path: 'workers',         element: <Workers />    },
-      { path: 'settings',        element: <Settings />   },
+      { index: true, element: <Navigate to="/projects" replace /> },
+      { path: 'projects', element: <ProjectsList /> },
+      { path: 'projects/:id', element: <ProjectDetails /> },
+      { path: 'reports', element: <ReportsList /> },
+      { path: 'reports/:id', element: <ReportDetails /> }
     ],
+  },
+  {
+    path: '/login',
+    element: <Login />,
+  },
+  {
+    path: '/signup',
+    element: <Signup />,
   },
 ]);
