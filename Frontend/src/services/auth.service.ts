@@ -7,8 +7,13 @@ export const authService = {
   login: (payload: LoginPayload) =>
     apiClient.post<ApiResponse<{ user: User; tokens: AuthTokens }>>('/auth/login', payload),
 
-  register: (payload: RegisterPayload) =>
-    apiClient.post<ApiResponse<{ user: User; tokens: AuthTokens }>>('/auth/register', payload),
+  register: (payload: RegisterPayload) => {
+    const { confirmPassword, ...data } = payload;
+    return apiClient.post<ApiResponse<{ user: User; tokens: AuthTokens }>>('/auth/register', data);
+  },
+
+  updateProfile: (payload: { name?: string; email?: string }) =>
+    apiClient.put<ApiResponse<User>>('/auth/profile', payload),
 
   logout: () => apiClient.post('/auth/logout'),
 

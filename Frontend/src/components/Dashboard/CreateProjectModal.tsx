@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, X, Link as LinkIcon, Loader2 } from 'lucide-react';
-import { useAppStore, Project } from '../../store/useAppStore';
+import { useAppStore } from '../../store/useAppStore';
 import { swaggerService } from '../../services/swaggerService';
 
 export const CreateProjectModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   const [name, setName] = useState('');
   const [url, setUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const addProject = useAppStore((state) => state.addProject);
   const navigate = useNavigate();
 
@@ -17,23 +18,19 @@ export const CreateProjectModal = ({ isOpen, onClose }: { isOpen: boolean; onClo
     if (!name || !url) return;
 
     setIsLoading(true);
-    const endpoints = await swaggerService.importSwagger(url);
-    
-    const newProject: Project = {
-      id: Math.random().toString(36).substring(7),
-      name,
-      swaggerUrl: url,
-      endpoints,
-      logs: [{ id: '1', timestamp: new Date().toLocaleTimeString(), message: 'Swagger APIs imported successfully', type: 'success' }],
-      insights: [],
-      tokens: [],
-      testingState: 'idle'
-    };
-
-    addProject(newProject);
-    setIsLoading(false);
-    onClose();
-    navigate(`/projects/${newProject.id}`);
+    setError(null);
+    try {
+      const { project } = await swaggerService.importSwagger(name, url);
+      addProject(project);
+      onClose();
+      navigate(`/projects/${project.id}`);
+    } catch (err: any) {
+      console.error(err);
+      const msg = err.response?.data?.error?.message || err.response?.data?.message || err.message || 'Swagger schema import failed.';
+      setError(msg);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -54,6 +51,12 @@ export const CreateProjectModal = ({ isOpen, onClose }: { isOpen: boolean; onClo
             </div>
             
             <form onSubmit={handleImport} className="p-6 space-y-4">
+              {error && (
+                <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold leading-relaxed animate-fade-in">
+                  {error}
+                </div>
+              )}
+              
               <div className="space-y-2">
                 <label className="text-sm font-medium text-[var(--ink-muted)]">Project Name</label>
                 <input

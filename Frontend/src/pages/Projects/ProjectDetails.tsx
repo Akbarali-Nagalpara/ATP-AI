@@ -1,16 +1,23 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
-  Play, ArrowLeft, ShieldAlert, Terminal, CheckCircle2, XCircle, 
-  FileText, Activity, Shield, Key, Eye, Search, Filter,
-  BarChart3, LayoutGrid, Download, Zap, ChevronRight, Clock
+  Play, ArrowLeft, ShieldAlert, Terminal, CheckCircle2, 
+  Activity, Shield, Key, Eye, Search, 
+  BarChart3, LayoutGrid, Zap
 } from 'lucide-react';
 import { useAppStore, Endpoint } from '../../store/useAppStore';
 import { aiService } from '../../services/aiService';
 import { testRunnerService } from '../../services/testRunnerService';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RolesTokensModal } from '../../components/Dashboard/RolesTokensModal';
-import { ApiDetailsModal } from '../../components/Project/ApiDetailsModal';
+import {
+  SummaryCards,
+  FailureTable,
+  EndpointDetailsDrawer,
+  ReportCharts,
+  DownloadButtons,
+  ExecutionTimeline
+} from '../../components/report';
 import { OtpWorkflowModal } from '../../components/OTP/OtpWorkflowModal';
 import { OtpDetectionStatus } from '../../components/OTP/OtpDetectionStatus';
 
@@ -107,40 +114,30 @@ export const ProjectDetails = () => {
         updateToken(project.id, 'Worker', { status: 'Authenticated', token });
       }
 
-      // 3. Collecting Remaining Tokens
-      const rolesToAuth = [...new Set(updatedEndpoints.map(e => e.role).filter(r => r !== 'Public' && r !== 'Worker'))];
-      const initialTokens = rolesToAuth.map(role => ({ role, status: 'Pending' as const }));
-      
-      // Merge with existing Worker token if OTP was successful
-      const existingTokens = useAppStore.getState().projects.find(p => p.id === project.id)?.tokens || [];
-      const updatedTokens = [...existingTokens];
-      rolesToAuth.forEach(role => {
-        if (!updatedTokens.find(t => t.role === role)) {
-          updatedTokens.push({ role, status: 'Pending' });
-        }
-      });
-      
-      updateProjectState(project.id, { testingState: 'collecting_tokens', tokens: updatedTokens });
-      addLog(project.id, 'Collecting Remaining JWT Tokens...', 'info');
-      
-      const tokens = await testRunnerService.collectTokens();
-      
-      for (const role of rolesToAuth) {
-        updateToken(project.id, role, { status: 'Authenticating' });
-        await new Promise(r => setTimeout(r, 800));
-        
-        const token = tokens[role as keyof typeof tokens] || `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${role}`;
-        updateToken(project.id, role, { status: 'Authenticated', token });
-        addLog(project.id, `${role} Token Stored`, 'success');
-      }
-
-      // 4. Testing APIs
+      // 3. Sorting APIs (Authentication Endpoints First)
       updateProjectState(project.id, { testingState: 'testing' });
-      addLog(project.id, 'Running APIs...', 'info');
+      addLog(project.id, 'Sorting endpoints (Auth first)...', 'info');
+      
+      const sortedEndpoints = [...updatedEndpoints].sort((a, b) => {
+        const aPath = a.path.toLowerCase();
+        const bPath = b.path.toLowerCase();
+        const aIsAuth = aPath.includes('login') || aPath.includes('auth') || aPath.includes('register');
+        const bIsAuth = bPath.includes('login') || bPath.includes('auth') || bPath.includes('register');
+        if (aIsAuth && !bIsAuth) return -1;
+        if (!aIsAuth && bIsAuth) return 1;
+        return 0;
+      });
 
-      for (const ep of updatedEndpoints) {
+      addLog(project.id, 'Running APIs in dependency order...', 'info');
+
+      for (const ep of sortedEndpoints) {
         updateEndpoint(project.id, ep.id, { status: 'Running' });
-        const result = await testRunnerService.runTest(ep);
+        
+        // Retrieve current token for this role from the store
+        const currentProjectState = useAppStore.getState().projects.find(p => p.id === project.id);
+        const roleToken = currentProjectState?.tokens.find(t => t.role === ep.role)?.token;
+        
+        const result = await testRunnerService.runTest(ep, roleToken);
         
         updateEndpoint(project.id, ep.id, { 
           status: result.passed ? 'Pass' : 'Fail',
@@ -150,8 +147,19 @@ export const ProjectDetails = () => {
 
         if (result.passed) {
           addLog(project.id, `PASS ${result.statusCode} | ${ep.method} ${ep.path}`, 'success');
+          
+          if (result.extractedToken) {
+            // Save the newly extracted token to the store
+            const existingTokens = currentProjectState?.tokens || [];
+            if (!existingTokens.find(t => t.role === ep.role)) {
+               updateProjectState(project.id, { tokens: [...existingTokens, { role: ep.role, status: 'Authenticated', token: result.extractedToken }] });
+            } else {
+               updateToken(project.id, ep.role, { status: 'Authenticated', token: result.extractedToken });
+            }
+            addLog(project.id, `Extracted & Saved Token for role: ${ep.role}`, 'warning');
+          }
         } else {
-          addLog(project.id, `FAIL ${result.statusCode} | ${ep.method} ${ep.path}`, 'error');
+          addLog(project.id, `FAIL ${result.statusCode} | ${ep.method} ${ep.path}${!roleToken && ep.authRequired ? ' (Missing Token)' : ''}`, 'error');
         }
       }
 
@@ -488,36 +496,40 @@ export const ProjectDetails = () => {
               )}
 
               {activeView === 'reports' && (
-                <div className="h-full flex flex-col gap-6">
-                  <div className="flex items-center justify-between">
+                <div className="space-y-8 animate-fade-in">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                      <h2 className="text-xl font-bold text-[var(--ink)] tracking-tight">Execution Summary</h2>
-                      <p className="text-sm text-[var(--ink-muted)]">High-level metrics for this test run</p>
+                      <h2 className="text-lg font-bold text-[var(--ink)] tracking-tight">Execution Summary</h2>
+                      <p className="text-xs text-[var(--ink-muted)] mt-0.5">High-level telemetry metrics and interactive report visualization</p>
                     </div>
-                    <button className="flex items-center gap-2 bg-[var(--surface)] hover:bg-[var(--surface-hover)] text-[var(--ink)] px-4 py-2 rounded-xl text-sm font-medium transition-colors border border-[var(--outline)] shadow-sm">
-                      <Download className="w-4 h-4" /> Export PDF
-                    </button>
+                    <DownloadButtons project={project} />
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-                    {[
-                      { label: 'Total APIs', value: project.endpoints.length, color: 'text-blue-500' },
-                      { label: 'Passed Tests', value: passedCount, color: 'text-emerald-500' },
-                      { label: 'Failed Tests', value: failedCount, color: 'text-rose-500' },
-                      { label: 'Avg Response', value: '142ms', color: 'text-amber-500' },
-                    ].map((stat, i) => (
-                      <div key={i} className="bg-[var(--surface)] border border-[var(--outline)] p-5 rounded-2xl shadow-lg relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[var(--color-primary)]/5 to-transparent rounded-bl-full opacity-50 group-hover:scale-110 transition-transform" />
-                        <p className="text-xs font-bold text-[var(--ink-muted)] uppercase tracking-wider mb-2">{stat.label}</p>
-                        <p className={`text-3xl font-bold ${stat.color} tracking-tight`}>{stat.value}</p>
-                      </div>
-                    ))}
+                  <SummaryCards
+                    total={project.endpoints.length}
+                    passed={passedCount}
+                    failed={failedCount}
+                    avgResponseTime={142}
+                  />
+
+                  <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                    <div className="xl:col-span-2">
+                      <ReportCharts endpoints={project.endpoints} />
+                    </div>
+                    <div className="xl:col-span-1">
+                      <ExecutionTimeline project={project} />
+                    </div>
                   </div>
 
-                  <div className="flex-1 bg-[var(--surface)] border border-[var(--outline)] rounded-2xl shadow-lg p-6 flex flex-col items-center justify-center">
-                    <BarChart3 className="w-16 h-16 text-[var(--outline-strong)] mb-4" />
-                    <h3 className="text-lg font-bold text-[var(--ink)] mb-1">Visualization Module</h3>
-                    <p className="text-[var(--ink-muted)] text-sm max-w-sm text-center">Interactive charts and graphs representing endpoint reliability and response time trends will appear here.</p>
+                  <div className="space-y-4">
+                    <div>
+                      <h2 className="text-lg font-bold text-[var(--ink)] tracking-tight">API Spec Telemetry</h2>
+                      <p className="text-xs text-[var(--ink-muted)] mt-0.5">Review functional status, latency profiles, and diagnostics across tested schemas</p>
+                    </div>
+                    <FailureTable
+                      endpoints={project.endpoints}
+                      onInspect={(endpoint) => setSelectedEndpoint(endpoint)}
+                    />
                   </div>
                 </div>
               )}
@@ -527,7 +539,7 @@ export const ProjectDetails = () => {
       </div>
 
       <RolesTokensModal isOpen={isRolesModalOpen} onClose={() => setIsRolesModalOpen(false)} projectId={project.id} />
-      <ApiDetailsModal isOpen={selectedEndpoint !== null} onClose={() => setSelectedEndpoint(null)} endpoint={selectedEndpoint} />
+      <EndpointDetailsDrawer isOpen={selectedEndpoint !== null} onClose={() => setSelectedEndpoint(null)} endpoint={selectedEndpoint} />
       <OtpWorkflowModal isOpen={isOtpModalOpen} onClose={() => setIsOtpModalOpen(false)} workflow={project.otpWorkflow || null} />
     </div>
   );

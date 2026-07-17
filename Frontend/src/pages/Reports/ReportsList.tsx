@@ -1,29 +1,56 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FileText, Download, RotateCw, CheckCircle2, ShieldAlert } from 'lucide-react';
+import { FileText, Download, CheckCircle2, ShieldAlert } from 'lucide-react';
 import { useAppStore } from '../../store/useAppStore';
 
 export const ReportsList = () => {
-  const projects = useAppStore((state) => state.projects.filter(p => p.testingState === 'completed'));
+  const allProjects = useAppStore((state) => state.projects);
+  const projects = allProjects.filter(p => p.testingState === 'completed');
   const navigate = useNavigate();
 
   return (
     <div className="p-8 max-w-7xl mx-auto w-full">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Reports</h1>
-          <p className="text-gray-400 text-sm mt-1">Generated AI test reports across all projects</p>
-        </div>
-      </div>
+
 
       {projects.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-24 bg-[#111112] border border-[#222] border-dashed rounded-2xl">
-          <FileText className="w-12 h-12 text-gray-600 mb-4" />
-          <p className="text-gray-400 text-sm mb-4">No reports generated yet. Run a test to generate one.</p>
+        <div className="flex flex-col items-center justify-center py-20 text-center max-w-lg mx-auto mt-12 transition-all">
+          <div className="relative mb-6">
+            {/* Sparkles */}
+            <div className="absolute -top-4 -left-4 animate-bounce text-pink-300" style={{ animationDuration: '3s' }}>
+              <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                <path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z" />
+              </svg>
+            </div>
+            <div className="absolute -top-2 -right-4 animate-bounce text-pink-300" style={{ animationDuration: '4.5s' }}>
+              <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                <path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z" />
+              </svg>
+            </div>
+            <div className="absolute bottom-2 -right-4 animate-pulse text-pink-300">
+              <svg className="w-2.5 h-2.5 fill-current" viewBox="0 0 24 24">
+                <path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z" />
+              </svg>
+            </div>
+
+            {/* Pink Folder */}
+            <div className="w-20 h-16 bg-gradient-to-br from-pink-300 via-pink-400 to-rose-400 rounded-2xl shadow-[0_12px_24px_rgba(244,63,94,0.2)] relative flex items-center justify-center border border-white/20">
+              {/* Folder tab */}
+              <div className="absolute -top-2.5 left-3 w-8 h-4 bg-pink-300 rounded-t-lg -z-10" />
+              {/* Inner document sheet peaking out */}
+              <div className="absolute -top-1 left-6 w-8 h-8 bg-white/90 rounded-md -z-10 shadow-sm transform -rotate-6" />
+              {/* Folder front flap */}
+              <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-br from-pink-300/40 to-rose-500/10 backdrop-blur-[2px] rounded-b-2xl border-t border-white/20" />
+            </div>
+          </div>
+
+          <h3 className="text-[var(--ink)] text-base font-bold tracking-tight">No reports generated yet</h3>
+          <p className="text-[var(--ink-muted)] text-xs mt-1.5 leading-relaxed max-w-sm mb-6">
+            Create a project and run tests to see reports here.
+          </p>
+          
           <button
             onClick={() => navigate('/projects')}
-            className="text-[#e32636] text-sm font-medium hover:underline"
+            className="inline-flex items-center gap-2 bg-[var(--color-primary)] hover:opacity-90 active:scale-95 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition-all shadow-md"
           >
             Go to Projects
           </button>

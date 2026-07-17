@@ -13,15 +13,30 @@ export const testRunnerService = {
     });
   },
 
-  runTest: async (endpoint: Endpoint): Promise<{ passed: boolean; statusCode: number; responseTime: number }> => {
+  runTest: async (endpoint: Endpoint, token?: string): Promise<{ passed: boolean; statusCode: number; responseTime: number; extractedToken?: string }> => {
     return new Promise((resolve) => {
       // Simulate real-world delay for testing
       const delay = Math.floor(Math.random() * 500) + 200;
       setTimeout(() => {
-        // Mock logic: some fail, some pass based on path
-        if (endpoint.path.includes('/client/orders')) {
+        const path = endpoint.path.toLowerCase();
+        const isAuthEndpoint = path.includes('login') || path.includes('auth') || path.includes('token') || path.includes('register');
+
+        // Mock logic: token extraction for auth endpoints
+        if (isAuthEndpoint) {
+          resolve({ 
+            passed: true, 
+            statusCode: 200, 
+            responseTime: delay, 
+            extractedToken: `mock_jwt_${endpoint.role.toLowerCase()}_${Math.random().toString(36).substr(2, 5)}` 
+          });
+        }
+        // Fail if it requires auth but no token was provided
+        else if (endpoint.authRequired && !token) {
+          resolve({ passed: false, statusCode: 401, responseTime: delay });
+        }
+        else if (path.includes('/client/orders')) {
           resolve({ passed: false, statusCode: 403, responseTime: delay });
-        } else if (endpoint.path.includes('DELETE')) {
+        } else if (path.includes('delete')) {
           resolve({ passed: false, statusCode: 500, responseTime: delay });
         } else {
           resolve({ passed: true, statusCode: 200, responseTime: delay });

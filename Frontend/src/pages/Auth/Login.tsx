@@ -3,9 +3,11 @@ import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   Mail, Lock, Eye, EyeOff, 
-  ChevronRight, ArrowRight, Zap, Loader2, Shield
+  ArrowRight, Zap, Loader2, Shield
 } from 'lucide-react';
 import { AuthSimulation } from '../../components/Auth/AuthSimulation';
+import { authService } from '../../services/auth.service';
+import { useAuthStore } from '../../store/auth.store';
 
 export const Login = () => {
   const navigate = useNavigate();
@@ -14,23 +16,45 @@ export const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingText, setLoadingText] = useState('');
+  const [error, setError] = useState<string | null>(null);
+
+  const setUser = useAuthStore((state) => state.setUser);
+  const setAccessToken = useAuthStore((state) => state.setAccessToken);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError(null);
     
-    const steps = [
-      'Connecting AI Engine...',
-      'Initializing Secure Session...',
-      'Loading API Runtime...'
-    ];
+    try {
+      // 1. Authenticate with Backend API
+      const response = await authService.login({ email, password });
+      const { user, tokens } = response.data.data;
 
-    for (const step of steps) {
-      setLoadingText(step);
-      await new Promise(r => setTimeout(r, 800));
+      // 2. Play beautiful simulation steps
+      const steps = [
+        'Connecting AI Engine...',
+        'Initializing Secure Session...',
+        'Loading API Runtime...'
+      ];
+
+      for (const step of steps) {
+        setLoadingText(step);
+        await new Promise(r => setTimeout(r, 600));
+      }
+
+      // 3. Update Zustand Store
+      setAccessToken(tokens.accessToken);
+      setUser(user);
+
+      // 4. Redirect
+      navigate('/projects');
+    } catch (err: any) {
+      console.error(err);
+      const msg = err.response?.data?.error?.message || err.response?.data?.message || 'Failed to authenticate. Please check your credentials.';
+      setError(msg);
+      setIsLoading(false);
     }
-
-    navigate('/projects');
   };
 
   return (
@@ -53,7 +77,7 @@ export const Login = () => {
           className="w-full max-w-md z-10"
         >
           {/* Header */}
-          <div className="mb-10 text-center lg:text-left">
+          <div className="mb-8 text-center lg:text-left">
             <div className="flex items-center justify-center lg:justify-start gap-3 mb-6">
               <div className="w-12 h-12 rounded-2xl bg-[var(--color-primary)] flex items-center justify-center shadow-lg shadow-[var(--color-primary)]/20">
                 <Zap className="w-6 h-6 text-white fill-white" />
@@ -68,6 +92,17 @@ export const Login = () => {
               AI-Driven API Testing Platform. Automate Swagger-based testing with intelligent workflows.
             </p>
           </div>
+
+          {/* Error Alert Box */}
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6 p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold leading-relaxed text-center lg:text-left"
+            >
+              {error}
+            </motion.div>
+          )}
 
           {/* Login Form */}
           <form onSubmit={handleLogin} className="space-y-5">
@@ -89,7 +124,6 @@ export const Login = () => {
             <div className="space-y-2">
               <div className="flex items-center justify-between ml-1">
                 <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Secret Key</label>
-                <button type="button" className="text-[11px] font-bold text-[var(--color-primary)] hover:underline">Forgot?</button>
               </div>
               <div className="relative group">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 group-focus-within:text-[var(--color-primary)] transition-colors" />
@@ -111,11 +145,6 @@ export const Login = () => {
               </div>
             </div>
 
-            <div className="flex items-center gap-3 pt-2">
-              <input type="checkbox" id="remember" className="w-4 h-4 rounded-md bg-[#0d0d10] border border-[#222] accent-[var(--color-primary)]" />
-              <label htmlFor="remember" className="text-xs text-gray-500 font-medium cursor-pointer">Maintain persistent session</label>
-            </div>
-
             <button
               type="submit"
               disabled={isLoading}
@@ -135,20 +164,6 @@ export const Login = () => {
               )}
             </button>
           </form>
-
-          {/* Divider */}
-          <div className="my-8 flex items-center gap-4">
-            <div className="h-px flex-1 bg-[#1a1a1f]" />
-            <span className="text-[10px] font-bold text-gray-600 uppercase tracking-widest">Or authenticate via</span>
-            <div className="h-px flex-1 bg-[#1a1a1f]" />
-          </div>
-
-          <button className="w-full bg-white text-black font-bold py-4 rounded-2xl transition-all hover:bg-gray-100 flex items-center justify-center gap-3 shadow-xl">
-            <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
-            </svg>
-            Continue with GitHub
-          </button>
 
           {/* Footer */}
           <p className="mt-10 text-center text-sm text-gray-500 font-medium">

@@ -12,6 +12,8 @@ import {
   ChevronUp,
   Settings as SettingsIcon
 } from 'lucide-react';
+import { SettingsModal, SettingsTab } from './SettingsModal';
+import { useAuthStore } from '../../store/auth.store';
 
 const NAV_GROUPS = [
   {
@@ -29,18 +31,24 @@ export const Sidebar = () => {
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [settingsTab, setSettingsTab] = useState<SettingsTab>('profile');
+
+  const user = useAuthStore((state) => state.user);
+  const authLogout = useAuthStore((state) => state.logout);
 
   const handleLogout = () => {
-    // Simulated logout
+    authLogout();
     navigate('/login');
   };
 
   return (
-    <motion.aside
-      animate={{ width: collapsed ? 72 : 272 }}
-      transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
-      className="relative flex flex-col h-screen bg-[var(--surface)] border-r border-[var(--outline)] shrink-0 overflow-hidden z-20 shadow-xl backdrop-blur transition-colors duration-300"
-    >
+    <>
+      <motion.aside
+        animate={{ width: collapsed ? 72 : 272 }}
+        transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
+        className="relative flex flex-col h-screen bg-[var(--surface)] border-r border-[var(--outline)] shrink-0 overflow-hidden z-20 shadow-xl backdrop-blur transition-colors duration-300"
+      >
       {/* Logo */}
       <div className="flex items-center gap-4 px-5 py-5 border-b border-[var(--outline)] min-h-[76px] transition-colors duration-300">
         <div className="w-10 h-10 rounded-xl bg-[var(--color-primary)] flex items-center justify-center shrink-0 shadow-lg">
@@ -158,8 +166,8 @@ export const Sidebar = () => {
             className={`flex items-center gap-3.5 px-3.5 py-3 mt-3 rounded-xl bg-[var(--surface-hover)] border border-[var(--outline)] hover:border-[var(--outline-strong)] transition-all cursor-pointer ${collapsed ? 'justify-center' : ''}`}
           >
             <div className="relative">
-              <div className="w-10 h-10 rounded-xl bg-[var(--color-primary)] flex items-center justify-center shrink-0 text-white text-[12px] font-bold shadow-sm">
-                A
+              <div className="w-10 h-10 rounded-xl bg-[var(--color-primary)] flex items-center justify-center shrink-0 text-white text-[12px] font-bold shadow-sm uppercase">
+                {user?.name ? user.name.charAt(0) : 'U'}
               </div>
               <span className="absolute -right-0.5 -bottom-0.5 w-3 h-3 rounded-full bg-[var(--color-success)] ring-2 ring-[var(--surface-hover)]" />
             </div>
@@ -167,8 +175,8 @@ export const Sidebar = () => {
               {!collapsed && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="overflow-hidden flex-1 flex items-center justify-between">
                   <div className="min-w-0">
-                    <p className="text-[14px] font-bold text-[var(--ink)] truncate">Admin User</p>
-                    <p className="text-[11px] text-[var(--ink-muted)] truncate">admin@atp.ai</p>
+                    <p className="text-[14px] font-bold text-[var(--ink)] truncate">{user?.name || 'User'}</p>
+                    <p className="text-[11px] text-[var(--ink-muted)] truncate">{user?.email || 'user@atp.ai'}</p>
                   </div>
                   <ChevronUp className={`w-4 h-4 text-[var(--ink-muted)] transition-transform ${userMenuOpen ? 'rotate-0' : 'rotate-180'}`} />
                 </motion.div>
@@ -187,14 +195,14 @@ export const Sidebar = () => {
               >
                 <div className="p-2 space-y-1">
                   <button 
-                    onClick={() => { setUserMenuOpen(false); /* Add profile logic */ }}
+                    onClick={() => { setUserMenuOpen(false); setSettingsTab('profile'); setIsSettingsOpen(true); }}
                     className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-[var(--ink-muted)] hover:text-[var(--ink)] hover:bg-[var(--surface-hover)] transition-all text-left"
                   >
                     <User className="w-4 h-4" />
                     Profile Settings
                   </button>
                   <button 
-                    onClick={() => { setUserMenuOpen(false); /* Add admin settings logic */ }}
+                    onClick={() => { setUserMenuOpen(false); setSettingsTab('admin'); setIsSettingsOpen(true); }}
                     className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-[var(--ink-muted)] hover:text-[var(--ink)] hover:bg-[var(--surface-hover)] transition-all text-left"
                   >
                     <SettingsIcon className="w-4 h-4" />
@@ -222,6 +230,13 @@ export const Sidebar = () => {
       >
         {collapsed ? <ChevronRight className="w-3 h-3" /> : <ChevronLeft className="w-3 h-3" />}
       </button>
-    </motion.aside>
+      </motion.aside>
+
+      <SettingsModal 
+        isOpen={isSettingsOpen} 
+        onClose={() => setIsSettingsOpen(false)} 
+        initialTab={settingsTab} 
+      />
+    </>
   );
 };
