@@ -51,8 +51,8 @@ export const Sidebar = () => {
       >
       {/* Logo */}
       <div className="flex items-center gap-4 px-5 py-5 border-b border-[var(--outline)] min-h-[76px] transition-colors duration-300">
-        <div className="w-10 h-10 rounded-xl bg-[var(--color-primary)] flex items-center justify-center shrink-0 shadow-lg">
-          <Zap className="w-5 h-5 text-white fill-white" />
+        <div className="w-10 h-10 rounded-xl bg-transparent flex items-center justify-center shrink-0">
+          <img src="/Endpoint%20IQ.png" alt="Logo" className="w-full h-full object-contain" />
         </div>
         <AnimatePresence>
           {!collapsed && (
@@ -63,7 +63,7 @@ export const Sidebar = () => {
               transition={{ duration: 0.15 }}
               className="flex flex-col overflow-hidden"
             >
-              <span className="text-[var(--ink)] font-bold text-[15px] leading-tight tracking-wide whitespace-nowrap">ATP AI</span>
+              <span className="text-[var(--ink)] font-bold text-[15px] leading-tight tracking-wide whitespace-nowrap">Endpoint IQ</span>
               <span className="text-[var(--color-primary)] text-[9px] font-bold tracking-[0.2em] uppercase leading-tight whitespace-nowrap">Testing Platform</span>
             </motion.div>
           )}

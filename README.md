@@ -1,4 +1,5 @@
-# ATP-AI — AI-Driven API Testing Platform
+# Endpoint IQ 
+An AI-powered Automated API Testing Platform.
 
 > **Automatically test your APIs with AI.** Import an OpenAPI/Swagger spec, provide credentials for each role, and receive a detailed AI-generated report — without writing a single test by hand.
 

@@ -86,11 +86,11 @@ export const Signup = () => {
           {/* Header */}
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-2xl bg-[var(--color-primary)] flex items-center justify-center shadow-lg shadow-[var(--color-primary)]/20">
-                <Zap className="w-6 h-6 text-white fill-white" />
+              <div className="w-12 h-12 rounded-2xl bg-transparent flex items-center justify-center">
+                <img src="/Endpoint%20IQ.png" alt="Logo" className="w-full h-full object-contain drop-shadow-xl" />
               </div>
               <div>
-                <h1 className="text-3xl font-black text-white tracking-tighter">ATP AI</h1>
+                <h1 className="text-3xl font-black text-white tracking-tighter">Endpoint IQ</h1>
                 <p className="text-[10px] text-[var(--color-primary)] font-bold tracking-[0.3em] uppercase leading-none">Testing Platform</p>
               </div>
             </div>
