@@ -1,0 +1,228 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==================================================
+// ENUMS
+// ==================================================
+
+enum HttpMethod {
+  GET
+  POST
+  PUT
+  PATCH
+  DELETE
+}
+
+enum TestRunStatus {
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+enum SeverityLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+// ==================================================
+// MODELS
+// ==================================================
+
+model User {
+  id           String    @id @default(uuid())
+  name         String
+  email        String    @unique
+  passwordHash String    @map("password_hash")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  projects     Project[]
+
+  @@index([email])
+  @@map("users")
+}
+
+model Project {
+  id         String     @id @default(uuid())
+  userId     String     @map("user_id")
+  name       String
+  swaggerUrl String?    @map("swagger_url")
+  createdAt  DateTime   @default(now()) @map("created_at")
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoints  Endpoint[]
+  roles      Role[]
+  testRuns   TestRun[]
+
+  @@index([userId])
+  @@map("projects")
+}
+
+model Endpoint {
+  id               String       @id @default(uuid())
+  projectId        String       @map("project_id")
+  method           HttpMethod
+  path             String
+  summary          String?
+  requestSchema    Json?        @map("request_schema") @db.JsonB
+  responseSchema   Json?        @map("response_schema") @db.JsonB
+  headersSchema    Json?        @map("headers_schema") @db.JsonB
+  querySchema      Json?        @map("query_schema") @db.JsonB
+  pathParamsSchema Json?        @map("path_params_schema") @db.JsonB
+  authRequired     Boolean      @default(false) @map("auth_required")
+  tags             Json?        @db.JsonB
+  createdAt        DateTime     @default(now()) @map("created_at")
+
+  project          Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  testResults      TestResult[]
+
+  @@unique([projectId, method, path])
+  @@index([projectId])
+  @@index([method, path])
+  @@map("endpoints")
+}
+
+model Role {
+  id         String       @id @default(uuid())
+  projectId  String       @map("project_id")
+  name       String
+  createdAt  DateTime     @default(now()) @map("created_at")
+
+  project    Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  credentials Credential[]
+  sessions   Session[]
+  testResults TestResult[]
+  otpLogs    OTPLog[]
+
+  @@index([projectId])
+  @@map("roles")
+}
+
+model Credential {
+  id                String   @id @default(uuid())
+  roleId            String   @map("role_id")
+  username          String
+  passwordEncrypted String   @map("password_encrypted")
+  loginEndpoint     String?  @map("login_endpoint")
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  role              Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@index([roleId])
+  @@map("credentials")
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  roleId       String   @map("role_id")
+  accessToken  String   @map("access_token")
+  refreshToken String?  @map("refresh_token")
+  expiresAt    DateTime @map("expires_at")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  role         Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@index([roleId])
+  @@map("sessions")
+}
+
+model TestRun {
+  id          String        @id @default(uuid())
+  projectId   String        @map("project_id")
+  status      TestRunStatus @default(RUNNING)
+  totalApis   Int           @default(0) @map("total_apis")
+  passedCount Int           @default(0) @map("passed_count")
+  failedCount Int           @default(0) @map("failed_count")
+  startedAt   DateTime      @default(now()) @map("started_at")
+  completedAt DateTime?     @map("completed_at")
+
+  project     Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  testResults TestResult[]
+  reports     Report[]
+  otpLogs     OTPLog[]
+
+  @@index([projectId])
+  @@map("test_runs")
+}
+
+model TestResult {
+  id               String       @id @default(uuid())
+  runId            String       @map("run_id")
+  endpointId       String       @map("endpoint_id")
+  roleId           String?      @map("role_id")
+  statusCode       Int?         @map("status_code")
+  responseBody     Json?        @map("response_body") @db.JsonB
+  responseHeaders  Json?        @map("response_headers") @db.JsonB
+  responseTimeMs   Int?         @map("response_time_ms")
+  success          Boolean
+  errorMessage     String?      @map("error_message")
+  createdAt        DateTime     @default(now()) @map("created_at")
+
+  testRun          TestRun      @relation(fields: [runId], references: [id], onDelete: Cascade)
+  endpoint         Endpoint     @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+  role             Role?        @relation(fields: [roleId], references: [id], onDelete: SetNull)
+  aiFindings       AIFinding[]
+
+  @@index([runId])
+  @@index([endpointId])
+  @@index([roleId])
+  @@map("test_results")
+}
+
+model Report {
+  id        String   @id @default(uuid())
+  runId     String   @map("run_id")
+  reportUrl String   @map("report_url")
+  summary   String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  testRun   TestRun  @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@index([runId])
+  @@map("reports")
+}
+
+model AIFinding {
+  id         String        @id @default(uuid())
+  resultId   String        @map("result_id")
+  issue      String
+  suggestion String
+  severity   SeverityLevel
+  createdAt  DateTime      @default(now()) @map("created_at")
+
+  testResult TestResult    @relation(fields: [resultId], references: [id], onDelete: Cascade)
+
+  @@index([resultId])
+  @@map("ai_findings")
+}
+
+model OTPLog {
+  id        String   @id @default(uuid())
+  runId     String   @map("run_id")
+  roleId    String?  @map("role_id")
+  otpValue  String   @map("otp_value")
+  source    String
+  status    String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  testRun   TestRun  @relation(fields: [runId], references: [id], onDelete: Cascade)
+  role      Role?    @relation(fields: [roleId], references: [id], onDelete: SetNull)
+
+  @@index([runId])
+  @@index([roleId])
+  @@map("otp_logs")
+}
