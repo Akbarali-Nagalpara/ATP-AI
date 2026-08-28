@@ -8,17 +8,22 @@ import { ErrorPage } from '../pages/ErrorPage';
 import { Login } from '../pages/Auth/Login';
 import { Signup } from '../pages/Auth/Signup';
 
+import { LandingPage } from '../pages/Landing/LandingPage';
+
 export const router = createBrowserRouter([
   {
     path: '/',
+    element: <LandingPage />,
+    errorElement: <ErrorPage />,
+  },
+  {
     element: <AppLayout />,
     errorElement: <ErrorPage />,
     children: [
-      { index: true, element: <Navigate to="/projects" replace /> },
-      { path: 'projects', element: <ProjectsList /> },
-      { path: 'projects/:id', element: <ProjectDetails /> },
-      { path: 'reports', element: <ReportsList /> },
-      { path: 'reports/:id', element: <ReportDetails /> }
+      { path: '/projects', element: <ProjectsList /> },
+      { path: '/projects/:id', element: <ProjectDetails /> },
+      { path: '/reports', element: <ReportsList /> },
+      { path: '/reports/:id', element: <ReportDetails /> }
     ],
   },
   {

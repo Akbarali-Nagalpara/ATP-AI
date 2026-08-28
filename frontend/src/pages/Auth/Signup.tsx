@@ -70,14 +70,14 @@ export const Signup = () => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row h-screen bg-[#050505] overflow-hidden">
+    <div className="flex flex-col lg:flex-row h-screen overflow-hidden" style={{ background: 'var(--canvas)' }}>
       {/* Left Side: Simulation */}
       <div className="hidden lg:block lg:w-1/2 h-full relative">
         <AuthSimulation />
       </div>
 
       {/* Right Side: Auth Form */}
-      <div className="w-full lg:w-1/2 h-full flex flex-col items-center justify-start p-8 lg:p-16 relative bg-[#08080a] border-l border-[#111] overflow-y-auto custom-scrollbar">
+      <div className="w-full lg:w-1/2 h-full flex flex-col items-center justify-start p-8 lg:p-16 relative overflow-y-auto custom-scrollbar border-l" style={{ background: 'var(--surface)', borderColor: 'var(--outline)' }}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -85,18 +85,13 @@ export const Signup = () => {
         >
           {/* Header */}
           <div className="mb-8">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-2xl bg-transparent flex items-center justify-center">
-                <img src="/Endpoint%20IQ.png" alt="Logo" className="w-full h-full object-contain drop-shadow-xl" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-black text-white tracking-tighter">Endpoint IQ</h1>
-                <p className="text-[10px] text-[var(--color-primary)] font-bold tracking-[0.3em] uppercase leading-none">Testing Platform</p>
-              </div>
+            <div className="flex items-center mb-6">
+              <img src="/Main_Logo.png" alt="Endpoint IQ Logo" className="w-80 max-w-none object-contain block dark:hidden" />
+              <img src="/main_Logo_Dark.png" alt="Endpoint IQ Logo" className="w-80 max-w-none object-contain hidden dark:block" />
             </div>
-            <h2 className="text-2xl font-bold text-white mb-2">Create Your AI Testing Workspace</h2>
-            <p className="text-gray-500 text-sm leading-relaxed">
-              Provision a new secure environment for automated API orchestration and AI analysis.
+            <h2 className="text-2xl font-bold text-[var(--ink)] mb-2">Create Your Workspace</h2>
+            <p className="text-[var(--ink-muted)] text-sm leading-relaxed">
+              Get started with AI-powered automated API testing in minutes.
             </p>
           </div>
 
@@ -105,31 +100,31 @@ export const Signup = () => {
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-6 p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold leading-relaxed text-center lg:text-left"
+              className="mb-5 p-3.5 rounded-xl bg-[var(--color-danger)]/10 border border-[var(--color-danger)]/20 text-[var(--color-danger)] text-xs font-semibold leading-relaxed"
             >
               {error}
             </motion.div>
           )}
 
           {/* Role Selection */}
-          <div className="mb-8">
-            <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest ml-1 mb-4 block">Select Operational Role</label>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <div className="mb-6">
+            <label className="text-[11px] font-bold text-[var(--ink-muted)] uppercase tracking-widest ml-1 mb-3 block">Your Role</label>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
               {ROLES.map((role) => (
                 <button
                   key={role.id}
                   type="button"
                   onClick={() => setSelectedRole(role.id)}
-                  className={`flex flex-col items-center gap-3 p-4 rounded-2xl border transition-all ${
-                    selectedRole === role.id 
-                      ? 'bg-[var(--color-primary)]/10 border-[var(--color-primary)] ring-1 ring-[var(--color-primary)]' 
-                      : 'bg-[#0d0d10] border-[#222] hover:border-[#333]'
+                  className={`flex flex-col items-center gap-2.5 p-3.5 rounded-xl border transition-all ${
+                    selectedRole === role.id
+                      ? 'bg-[var(--surface-2)] border-[var(--color-primary)] ring-1 ring-[var(--color-primary)]/50'
+                      : 'bg-[var(--surface-hover)] border-[var(--outline)] hover:border-[var(--outline-strong)]'
                   }`}
                 >
-                  <div className={`p-2.5 rounded-xl ${role.bg}`}>
-                    <role.icon className={`w-5 h-5 ${role.color}`} />
+                  <div className={`p-2 rounded-lg ${role.bg}`}>
+                    <role.icon className={`w-4 h-4 ${role.color}`} />
                   </div>
-                  <span className={`text-[11px] font-bold tracking-tight ${selectedRole === role.id ? 'text-white' : 'text-gray-400'}`}>
+                  <span className={`text-[11px] font-bold tracking-tight ${selectedRole === role.id ? 'text-[var(--ink)]' : 'text-[var(--ink-muted)]'}`}>
                     {role.label}
                   </span>
                 </button>
@@ -139,48 +134,48 @@ export const Signup = () => {
 
           {/* Signup Form */}
           <form onSubmit={handleSignup} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest ml-1">Identity Name</label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold text-[var(--ink-muted)] uppercase tracking-widest ml-1">Full Name</label>
                 <div className="relative group">
-                  <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 group-focus-within:text-[var(--color-primary)] transition-colors" />
+                  <UserIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--ink-faint)] group-focus-within:text-[var(--color-primary)] transition-colors" />
                   <input
                     type="text"
                     required
-                    placeholder="Admin User"
+                    placeholder="Your Name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full bg-[#0d0d10] border border-[#222] focus:border-[var(--color-primary)]/50 rounded-2xl py-3.5 pl-12 pr-4 text-sm text-white placeholder-gray-700 transition-all outline-none"
+                    className="w-full bg-[var(--surface-hover)] border border-[var(--outline)] focus:border-[var(--color-primary)]/60 focus:ring-2 focus:ring-[var(--color-primary)]/10 rounded-xl py-3 pl-10 pr-4 text-sm text-[var(--ink)] placeholder-[var(--ink-faint)] transition-all outline-none"
                   />
                 </div>
               </div>
-              <div className="space-y-2">
-                <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest ml-1">Email Endpoint</label>
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold text-[var(--ink-muted)] uppercase tracking-widest ml-1">Email</label>
                 <div className="relative group">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 group-focus-within:text-[var(--color-primary)] transition-colors" />
+                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--ink-faint)] group-focus-within:text-[var(--color-primary)] transition-colors" />
                   <input
                     type="email"
                     required
-                    placeholder="admin@atp.ai"
+                    placeholder="you@company.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-[#0d0d10] border border-[#222] focus:border-[var(--color-primary)]/50 rounded-2xl py-3.5 pl-12 pr-4 text-sm text-white placeholder-gray-700 transition-all outline-none"
+                    className="w-full bg-[var(--surface-hover)] border border-[var(--outline)] focus:border-[var(--color-primary)]/60 focus:ring-2 focus:ring-[var(--color-primary)]/10 rounded-xl py-3 pl-10 pr-4 text-sm text-[var(--ink)] placeholder-[var(--ink-faint)] transition-all outline-none"
                   />
                 </div>
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest ml-1">Workspace Secret Key</label>
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-bold text-[var(--ink-muted)] uppercase tracking-widest ml-1">Password</label>
               <div className="relative group">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 group-focus-within:text-[var(--color-primary)] transition-colors" />
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--ink-faint)] group-focus-within:text-[var(--color-primary)] transition-colors" />
                 <input
                   type="password"
                   required
                   placeholder="••••••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-[#0d0d10] border border-[#222] focus:border-[var(--color-primary)]/50 rounded-2xl py-3.5 pl-12 pr-4 text-sm text-white placeholder-gray-700 transition-all outline-none"
+                  className="w-full bg-[var(--surface-hover)] border border-[var(--outline)] focus:border-[var(--color-primary)]/60 focus:ring-2 focus:ring-[var(--color-primary)]/10 rounded-xl py-3 pl-10 pr-4 text-sm text-[var(--ink)] placeholder-[var(--ink-faint)] transition-all outline-none"
                 />
               </div>
             </div>
@@ -192,26 +187,25 @@ export const Signup = () => {
             <button
               type="submit"
               disabled={isLoading || !selectedRole}
-              className="w-full bg-[var(--color-primary)] hover:opacity-90 disabled:opacity-50 text-white font-bold py-4 rounded-2xl transition-all shadow-xl shadow-[var(--color-primary)]/20 flex items-center justify-center gap-3 group overflow-hidden relative mt-6"
+              className="w-full btn-primary disabled:opacity-50 text-white font-bold py-3.5 rounded-xl transition-all flex items-center justify-center gap-3 group mt-2"
             >
               {isLoading ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  <span className="font-mono text-sm tracking-tighter">{loadingText}</span>
+                  <span className="text-sm tracking-tight font-mono">{loadingText}</span>
                 </>
               ) : (
                 <>
-                  <span className="z-10">Provision Workspace</span>
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform z-10" />
-                  <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[0%] transition-transform duration-500" />
+                  <span>Create Workspace</span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </>
               )}
             </button>
           </form>
 
           {/* Social Auth */}
-          <div className="mt-8 pt-8 border-t border-[#1a1a1f] flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-gray-500 font-medium">
+          <div className="mt-8 pt-6 border-t border-[var(--outline)] flex items-center justify-center">
+            <p className="text-sm text-[var(--ink-muted)] font-medium">
               Already have a workspace?{' '}
               <Link to="/login" className="text-[var(--color-primary)] font-bold hover:underline">
                 Sign In

@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Play, ArrowLeft, ShieldAlert, Terminal, CheckCircle2, 
   Activity, Shield, Key, Eye, Search, 
-  BarChart3, LayoutGrid, Zap
+  BarChart3, LayoutGrid, Zap, Copy, Check, ShieldCheck
 } from 'lucide-react';
 import { useAppStore, Endpoint } from '../../store/useAppStore';
 import { aiService } from '../../services/aiService';
@@ -22,19 +22,19 @@ import { OtpWorkflowModal } from '../../components/OTP/OtpWorkflowModal';
 import { OtpDetectionStatus } from '../../components/OTP/OtpDetectionStatus';
 
 const methodColors: Record<string, string> = {
-  GET: 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20',
-  POST: 'text-blue-400 bg-blue-400/10 border-blue-400/20',
-  PUT: 'text-orange-400 bg-orange-400/10 border-orange-400/20',
-  DELETE: 'text-rose-400 bg-rose-400/10 border-rose-400/20',
-  PATCH: 'text-purple-400 bg-purple-400/10 border-purple-400/20',
+  GET: 'badge-method-get',
+  POST: 'badge-method-post',
+  PUT: 'badge-method-put',
+  DELETE: 'badge-method-delete',
+  PATCH: 'badge-method-patch',
 };
 
 const statusColors: Record<string, string> = {
-  Pending: 'text-gray-400 bg-gray-400/10 border-gray-400/20',
-  Queued: 'text-amber-400 bg-amber-400/10 border-amber-400/20',
-  Running: 'text-blue-400 bg-blue-400/10 border-blue-400/20 animate-pulse',
-  Pass: 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20',
-  Fail: 'text-rose-400 bg-rose-400/10 border-rose-400/20',
+  Pending: 'text-[var(--ink-muted)] bg-[var(--surface-hover)] border-[var(--outline)]',
+  Queued: 'text-[var(--color-warning)] bg-[var(--color-warning)]/10 border-[var(--color-warning)]/20',
+  Running: 'text-[var(--color-info)] bg-[var(--color-info)]/10 border-[var(--color-info)]/20 animate-pulse',
+  Pass: 'text-[var(--color-success)] bg-[var(--color-success)]/10 border-[var(--color-success)]/20',
+  Fail: 'text-[var(--color-danger)] bg-[var(--color-danger)]/10 border-[var(--color-danger)]/20',
 };
 
 type ViewMode = 'explorer' | 'console' | 'analysis' | 'reports';
@@ -52,6 +52,16 @@ export const ProjectDetails = () => {
   const [selectedEndpoint, setSelectedEndpoint] = useState<Endpoint | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [methodFilter, setMethodFilter] = useState('ALL');
+  const [logSearchQuery, setLogSearchQuery] = useState('');
+  const [copiedPrompts, setCopiedPrompts] = useState<Record<number, boolean>>({});
+
+  const handleCopyPrompt = (text: string, index: number) => {
+    navigator.clipboard.writeText(text);
+    setCopiedPrompts(prev => ({ ...prev, [index]: true }));
+    setTimeout(() => {
+      setCopiedPrompts(prev => ({ ...prev, [index]: false }));
+    }, 2000);
+  };
 
   useEffect(() => {
     if (activeView === 'console' && logsEndRef.current) {
@@ -187,10 +197,13 @@ export const ProjectDetails = () => {
   const testedCount = passedCount + failedCount;
   const passRate = testedCount > 0 ? Math.round((passedCount / testedCount) * 100) : 0;
   
+  const [statusFilter, setStatusFilter] = useState('ALL');
+
   const filteredEndpoints = project.endpoints.filter(ep => {
     const matchesSearch = ep.path.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesMethod = methodFilter === 'ALL' || ep.method === methodFilter;
-    return matchesSearch && matchesMethod;
+    const matchesStatus = statusFilter === 'ALL' || ep.status === statusFilter;
+    return matchesSearch && matchesMethod && matchesStatus;
   });
 
   const activeViewClass = 'bg-gradient-to-r from-[var(--surface-hover)] to-[var(--surface)] text-[var(--color-primary)] border-[var(--outline-strong)] shadow-sm';
@@ -273,16 +286,16 @@ export const ProjectDetails = () => {
               <span className="text-sm font-bold text-[var(--ink)]">{testedCount} / {project.endpoints.length}</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Passed</span>
-              <span className="text-sm font-bold text-emerald-400">{passedCount}</span>
+              <span className="text-[10px] text-[var(--ink-muted)] font-bold uppercase tracking-wider">Passed</span>
+              <span className="text-sm font-bold text-[var(--color-success)]">{passedCount}</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Failed</span>
-              <span className="text-sm font-bold text-rose-400">{failedCount}</span>
+              <span className="text-[10px] text-[var(--ink-muted)] font-bold uppercase tracking-wider">Failed</span>
+              <span className="text-sm font-bold text-[var(--color-danger)]">{failedCount}</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Success Rate</span>
-              <span className={`text-sm font-bold ${passRate > 80 ? 'text-emerald-400' : passRate > 50 ? 'text-amber-400' : 'text-rose-400'}`}>
+              <span className="text-[10px] text-[var(--ink-muted)] font-bold uppercase tracking-wider">Success Rate</span>
+              <span className={`text-sm font-bold ${passRate > 80 ? 'text-[var(--color-success)]' : passRate > 50 ? 'text-[var(--color-warning)]' : 'text-[var(--color-danger)]'}`}>
                 {testedCount > 0 ? `${passRate}%` : '--'}
               </span>
             </div>
@@ -326,6 +339,16 @@ export const ProjectDetails = () => {
                         <option value="PUT">PUT</option>
                         <option value="DELETE">DELETE</option>
                       </select>
+                      <select 
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                        className="bg-[var(--surface)] border border-[var(--outline)] rounded-lg px-3 py-1.5 text-sm text-[var(--ink-muted)] focus:outline-none focus:border-[var(--outline-strong)] transition-colors appearance-none cursor-pointer"
+                      >
+                        <option value="ALL">All Status</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Pass">Pass</option>
+                        <option value="Fail">Fail</option>
+                      </select>
                     </div>
                   </div>
                   
@@ -347,7 +370,7 @@ export const ProjectDetails = () => {
                         {filteredEndpoints.map((ep) => (
                           <tr key={ep.id} className="hover:bg-[var(--surface-hover)] transition-colors group">
                             <td className="px-6 py-3 whitespace-nowrap">
-                              <span className={`px-2.5 py-1 rounded-md text-[11px] font-bold border ${methodColors[ep.method]}`}>
+                              <span className={`px-2.5 py-1 rounded-md text-[11px] font-bold ${methodColors[ep.method]}`}>
                                 {ep.method}
                               </span>
                             </td>
@@ -404,24 +427,38 @@ export const ProjectDetails = () => {
                       <Terminal className="w-4 h-4 text-emerald-500" />
                       <span className="text-sm font-medium text-[var(--ink)]">execution_log.sh</span>
                     </div>
-                    <div className="flex gap-2">
-                      <span className="w-3 h-3 rounded-full bg-rose-500/80" />
-                      <span className="w-3 h-3 rounded-full bg-amber-500/80" />
-                      <span className="w-3 h-3 rounded-full bg-emerald-500/80" />
+                    <div className="flex items-center gap-4">
+                      <div className="relative">
+                        <Search className="w-3.5 h-3.5 text-[var(--ink-muted)] absolute left-2.5 top-1/2 -translate-y-1/2" />
+                        <input 
+                          type="text" 
+                          placeholder="Search logs..." 
+                          value={logSearchQuery}
+                          onChange={(e) => setLogSearchQuery(e.target.value)}
+                          className="bg-[var(--canvas)] border border-[var(--outline)] rounded pl-8 pr-2 py-1 text-[11px] text-[var(--ink)] placeholder-[var(--ink-muted)] focus:outline-none focus:border-[var(--outline-strong)] transition-colors w-40 font-sans"
+                        />
+                      </div>
+                      <div className="flex gap-2">
+                        <span className="w-3 h-3 rounded-full bg-rose-500/80" />
+                        <span className="w-3 h-3 rounded-full bg-amber-500/80" />
+                        <span className="w-3 h-3 rounded-full bg-emerald-500/80" />
+                      </div>
                     </div>
                   </div>
                   <div className="p-5 flex-1 overflow-y-auto text-[13px] leading-loose custom-scrollbar bg-[var(--canvas)]">
                     {project.logs.length === 0 ? (
-                      <div className="text-gray-600 h-full flex flex-col items-center justify-center gap-3">
-                        <Zap className="w-8 h-8 text-gray-700" />
+                      <div className="text-[var(--ink-muted)] h-full flex flex-col items-center justify-center gap-3 font-sans">
+                        <Zap className="w-8 h-8 text-[var(--ink-muted)] opacity-50" />
                         <p>Awaiting execution... Click 'Run Full Test' to begin workflow.</p>
                       </div>
                     ) : (
-                      project.logs.map((log) => {
-                        let color = 'text-gray-400';
-                        if (log.type === 'success') color = 'text-emerald-400';
-                        if (log.type === 'error') color = 'text-rose-400 font-bold';
-                        if (log.type === 'warning') color = 'text-amber-400';
+                      project.logs
+                        .filter(log => log.message.toLowerCase().includes(logSearchQuery.toLowerCase()))
+                        .map((log) => {
+                        let color = 'text-[var(--ink-muted)]';
+                        if (log.type === 'success') color = 'text-[var(--color-success)]';
+                        if (log.type === 'error') color = 'text-[var(--color-danger)] font-bold';
+                        if (log.type === 'warning') color = 'text-[var(--color-warning)]';
                         
                         return (
                           <motion.div 
@@ -430,8 +467,8 @@ export const ProjectDetails = () => {
                             key={log.id} 
                             className="flex gap-4 hover:bg-[var(--surface-hover)] px-2 rounded group transition-colors"
                           >
-                            <span className="text-gray-600 shrink-0 select-none">[{log.timestamp.split(' ')[0]}]</span>
-                            <span className="text-blue-500/50 select-none opacity-0 group-hover:opacity-100 transition-opacity">❯</span>
+                            <span className="text-[var(--ink-faint)] shrink-0 select-none">[{log.timestamp.split(' ')[0]}]</span>
+                            <span className="text-[var(--color-primary)]/50 select-none opacity-0 group-hover:opacity-100 transition-opacity">❯</span>
                             <span className={`${color} break-all`}>{log.message}</span>
                           </motion.div>
                         );
@@ -445,46 +482,95 @@ export const ProjectDetails = () => {
               {activeView === 'analysis' && (
                 <div className="space-y-4">
                   <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/20">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--color-accent)] to-[var(--color-primary-dark)] flex items-center justify-center shadow-lg">
                       <Zap className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <h2 className="text-xl font-bold text-white tracking-tight">AI Insights & Remediation</h2>
-                      <p className="text-sm text-gray-400">Automated failure analysis and suggested fixes</p>
+                      <h2 className="text-xl font-bold text-[var(--ink)] tracking-tight">AI Insights & Remediation</h2>
+                      <p className="text-sm text-[var(--ink-muted)]">Automated failure analysis and suggested fixes</p>
                     </div>
                   </div>
 
                   {project.insights.length === 0 ? (
                     <div className="bg-[var(--surface)] border border-[var(--outline)] rounded-2xl p-16 text-center shadow-xl">
-                      <div className="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <CheckCircle2 className="w-10 h-10 text-emerald-500" />
+                      <div className="w-20 h-20 bg-[var(--color-success)]/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <CheckCircle2 className="w-10 h-10 text-[var(--color-success)]" />
                       </div>
-                      <h3 className="text-2xl font-bold text-white mb-2 tracking-tight">System Healthy</h3>
-                      <p className="text-gray-400 max-w-sm mx-auto">No failures or vulnerabilities detected during the test execution. Your APIs are solid.</p>
+                      <h3 className="text-2xl font-bold text-[var(--ink)] mb-2 tracking-tight">System Healthy</h3>
+                      <p className="text-[var(--ink-muted)] max-w-sm mx-auto">No failures or vulnerabilities detected during the test execution. Your APIs are solid.</p>
                     </div>
                   ) : (
                     <div className="grid gap-5">
                       {project.insights.map((insight, i) => (
-                        <div key={i} className="bg-[var(--surface)] border border-[var(--outline)] hover:border-[var(--outline-strong)] rounded-2xl overflow-hidden shadow-xl transition-all">
+                        <div key={i} className="bg-[var(--surface)] border border-[var(--outline)] rounded-2xl overflow-hidden shadow-xl transition-all">
+                          {/* Header */}
                           <div className="px-6 py-4 border-b border-[var(--outline)] bg-[var(--surface-hover)] flex items-center gap-3">
-                            <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-rose-500/10 border border-rose-500/20 shrink-0">
-                              <ShieldAlert className="w-4 h-4 text-rose-400" />
+                            <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-[var(--color-danger)]/10 border border-[var(--color-danger)]/20 shrink-0">
+                              <ShieldAlert className="w-4 h-4 text-[var(--color-danger)]" />
                             </span>
                             <span className="font-mono text-sm font-bold text-[var(--ink)] truncate">{insight.endpoint}</span>
-                            <span className="ml-auto text-xs font-bold bg-rose-500/10 text-rose-400 px-2.5 py-1 rounded-md border border-rose-500/20">High Priority</span>
+                            <span className="ml-auto text-xs font-bold bg-[var(--color-danger)]/10 text-[var(--color-danger)] px-2.5 py-1 rounded-md border border-[var(--color-danger)]/20">High Priority</span>
                           </div>
-                          <div className="p-6 flex flex-col md:flex-row gap-6">
-                            <div className="flex-1 space-y-2">
-                              <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">Detected Issue</p>
-                              <p className="text-rose-400 font-medium text-lg">{insight.issue}</p>
+                          
+                          <div className="p-6 space-y-6">
+                            {/* Root Cause & Suggestion row */}
+                            <div className="flex flex-col md:flex-row gap-6">
+                              <div className="flex-1 space-y-2">
+                                <p className="text-xs font-bold text-[var(--ink-muted)] uppercase tracking-widest">Detected Root Cause</p>
+                                <p className="text-[var(--color-danger)] font-medium text-sm leading-relaxed">{insight.rootCause}</p>
+                              </div>
+                              <div className="w-px bg-[var(--outline)] hidden md:block" />
+                              <div className="flex-1 space-y-2">
+                                <p className="text-xs font-bold text-[var(--color-accent)] uppercase tracking-widest flex items-center gap-1.5">
+                                  <Zap className="w-3.5 h-3.5" /> AI Suggestion
+                                </p>
+                                <p className="text-[var(--ink)] text-sm leading-relaxed font-medium">{insight.suggestion}</p>
+                              </div>
                             </div>
-                            <div className="w-px bg-[var(--outline)] hidden md:block" />
-                            <div className="flex-1 space-y-2">
-                              <p className="text-xs font-bold text-indigo-400 uppercase tracking-widest flex items-center gap-1.5">
-                                <Zap className="w-3.5 h-3.5" /> AI Suggestion
-                              </p>
-                              <div className="bg-[var(--surface-hover)] border border-[var(--outline)] p-4 rounded-xl">
-                                <p className="text-[var(--ink-muted)] text-sm leading-relaxed">{insight.suggestion}</p>
+                            
+                            {/* Security Findings */}
+                            {insight.securityFindings && insight.securityFindings.length > 0 && (
+                              <div className="space-y-2 border-t border-[var(--outline)] pt-6">
+                                <p className="text-xs font-bold text-[var(--ink-muted)] uppercase tracking-widest flex items-center gap-1.5">
+                                  <ShieldCheck className="w-3.5 h-3.5 text-[var(--color-warning)]" /> Security Findings
+                                </p>
+                                <div className="flex flex-wrap gap-2">
+                                  {insight.securityFindings.map((finding, idx) => (
+                                    <span key={idx} className="bg-[var(--color-warning)]/10 border border-[var(--color-warning)]/20 text-[var(--color-warning)] px-3 py-1.5 rounded-lg text-xs font-semibold">
+                                      {finding}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Fix Prompt */}
+                            <div className="space-y-2 border-t border-[var(--outline)] pt-6">
+                              <div className="flex items-center justify-between">
+                                <p className="text-xs font-bold text-[var(--ink-muted)] uppercase tracking-widest flex items-center gap-1.5">
+                                  <Terminal className="w-3.5 h-3.5 text-[var(--color-success)]" /> Developer Fix Prompt
+                                </p>
+                                <button
+                                  onClick={() => handleCopyPrompt(insight.fixPrompt, i)}
+                                  className="text-xs text-[var(--ink-muted)] hover:text-[var(--ink)] flex items-center gap-1.5 transition-colors bg-[var(--surface-hover)] px-2.5 py-1 rounded border border-[var(--outline)]"
+                                >
+                                  {copiedPrompts[i] ? (
+                                    <>
+                                      <Check className="w-3.5 h-3.5 text-[var(--color-success)]" />
+                                      Copied!
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Copy className="w-3.5 h-3.5" />
+                                      Copy Prompt
+                                    </>
+                                  )}
+                                </button>
+                              </div>
+                              <div className="bg-[var(--canvas)] border border-[var(--outline)] p-4 rounded-xl overflow-x-auto custom-scrollbar">
+                                <pre className="text-xs font-mono text-[var(--ink-muted)] leading-relaxed whitespace-pre-wrap">
+                                  {insight.fixPrompt}
+                                </pre>
                               </div>
                             </div>
                           </div>

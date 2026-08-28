@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: endpoint_iq_db
+    environment:
+      POSTGRES_USER: endpoint_iq
+      POSTGRES_PASSWORD: endpoint_iq_password
+      POSTGRES_DB: endpoint_iq_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

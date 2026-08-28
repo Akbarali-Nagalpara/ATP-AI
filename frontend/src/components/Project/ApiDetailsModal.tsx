@@ -4,11 +4,11 @@ import { X, Copy, CheckCircle2, Braces, AlignLeft, Hash, Shield } from 'lucide-r
 import { Endpoint } from '../../store/useAppStore';
 
 const methodColors: Record<string, string> = {
-  GET: 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20',
-  POST: 'text-blue-400 bg-blue-400/10 border-blue-400/20',
-  PUT: 'text-orange-400 bg-orange-400/10 border-orange-400/20',
-  DELETE: 'text-rose-400 bg-rose-400/10 border-rose-400/20',
-  PATCH: 'text-purple-400 bg-purple-400/10 border-purple-400/20',
+  GET: 'badge-method-get',
+  POST: 'badge-method-post',
+  PUT: 'badge-method-put',
+  DELETE: 'badge-method-delete',
+  PATCH: 'badge-method-patch',
 };
 
 const JsonViewer = ({ data, title, icon: Icon }: { data: any, title: string, icon: React.ElementType }) => {
@@ -102,7 +102,7 @@ export const ApiDetailsModal = ({
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[var(--outline-strong)] to-transparent opacity-50" />
               <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-3">
-                  <span className={`px-2.5 py-1 rounded-md text-[11px] font-bold border ${methodColors[endpoint.method]}`}>
+                  <span className={`px-2.5 py-1 rounded-md text-[11px] font-bold ${methodColors[endpoint.method]}`}>
                     {endpoint.method}
                   </span>
                   <h3 className="text-lg font-mono font-bold text-[var(--ink)] tracking-tight">{endpoint.path}</h3>

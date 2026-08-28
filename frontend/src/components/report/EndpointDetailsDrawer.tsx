@@ -49,19 +49,20 @@ export const EndpointDetailsDrawer: React.FC<EndpointDetailsDrawerProps> = ({
 
   const getMethodBadgeClass = (method: string) => {
     switch (method) {
-      case 'GET': return 'text-emerald-400 border-emerald-500/20 bg-emerald-500/10';
-      case 'POST': return 'text-blue-400 border-blue-500/20 bg-blue-500/10';
-      case 'PUT': return 'text-orange-400 border-orange-500/20 bg-orange-500/10';
-      case 'DELETE': return 'text-rose-400 border-rose-500/20 bg-rose-500/10';
-      default: return 'text-purple-400 border-purple-500/20 bg-purple-500/10';
+      case 'GET': return 'badge-method-get';
+      case 'POST': return 'badge-method-post';
+      case 'PUT': return 'badge-method-put';
+      case 'DELETE': return 'badge-method-delete';
+      case 'PATCH': return 'badge-method-patch';
+      default: return 'text-[var(--ink-muted)] border-[var(--outline)] bg-[var(--surface-hover)]';
     }
   };
 
   const getStatusClass = (code?: number) => {
-    if (!code) return 'text-gray-400 border-white/10 bg-white/[0.03]';
-    if (code >= 200 && code < 300) return 'text-emerald-400 border-emerald-500/20 bg-emerald-500/10';
-    if (code >= 400 && code < 500) return 'text-amber-400 border-amber-500/20 bg-amber-500/10';
-    return 'text-rose-400 border-rose-500/20 bg-rose-500/10';
+    if (!code) return 'text-[var(--ink-muted)] border-[var(--outline)] bg-[var(--surface-hover)]';
+    if (code >= 200 && code < 300) return 'text-[var(--color-success)] border-[var(--color-success)]/20 bg-[var(--color-success)]/10';
+    if (code >= 400 && code < 500) return 'text-[var(--color-warning)] border-[var(--color-warning)]/20 bg-[var(--color-warning)]/10';
+    return 'text-[var(--color-danger)] border-[var(--color-danger)]/20 bg-[var(--color-danger)]/10';
   };
 
   // Generate mock response payload or schema diff
@@ -152,10 +153,10 @@ The endpoint **${endpoint.path}** returned 404 Not Found. The routing controller
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-            className="fixed inset-y-0 right-0 z-50 w-full max-w-2xl bg-[#0d0d0f] border-l border-white/5 flex flex-col shadow-2xl overflow-hidden h-full"
+            className="fixed inset-y-0 right-0 z-50 w-full max-w-2xl bg-[var(--surface)] border-l border-[var(--outline)] flex flex-col shadow-2xl overflow-hidden h-full"
           >
             {/* Header Section */}
-            <div className="p-6 border-b border-white/5 bg-white/[0.01] flex items-center justify-between shrink-0">
+            <div className="p-6 border-b border-[var(--outline)] bg-[var(--surface-hover)]/30 flex items-center justify-between shrink-0">
               <div className="space-y-1.5 max-w-[80%]">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold border uppercase tracking-wider ${getMethodBadgeClass(endpoint.method)}`}>
@@ -165,31 +166,31 @@ The endpoint **${endpoint.path}** returned 404 Not Found. The routing controller
                     {endpoint.statusCode || 'FAILED'}
                   </span>
                   {endpoint.responseTime && (
-                    <span className="text-[11px] font-mono text-gray-500">
+                    <span className="text-[11px] font-mono text-[var(--ink-muted)]">
                       {endpoint.responseTime}ms
                     </span>
                   )}
                 </div>
-                <h3 className="text-base font-mono font-bold text-white truncate" title={endpoint.path}>
+                <h3 className="text-base font-mono font-bold text-[var(--ink)] truncate" title={endpoint.path}>
                   {endpoint.path}
                 </h3>
               </div>
               <button 
                 onClick={onClose}
-                className="p-2 hover:bg-white/5 rounded-xl text-gray-400 hover:text-white transition-colors"
+                className="p-2 hover:bg-[var(--outline)] rounded-xl text-[var(--ink-muted)] hover:text-[var(--ink)] transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Navigation Tabs */}
-            <div className="flex border-b border-white/5 bg-white/[0.005] px-6 shrink-0">
+            <div className="flex border-b border-[var(--outline)] bg-[var(--surface-hover)]/20 px-6 shrink-0">
               {(['overview', 'payloads', 'logs'] as DrawerTab[]).map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
                   className={`py-3.5 px-4 text-xs font-semibold uppercase tracking-wider relative transition-all -mb-px ${
-                    activeTab === tab ? 'text-[var(--color-primary)] font-bold' : 'text-gray-500 hover:text-gray-300'
+                    activeTab === tab ? 'text-[var(--color-primary)] font-bold' : 'text-[var(--ink-muted)] hover:text-[var(--ink)]'
                   }`}
                 >
                   {tab}
@@ -208,13 +209,13 @@ The endpoint **${endpoint.path}** returned 404 Not Found. The routing controller
               {activeTab === 'overview' && (
                 <div className="space-y-6">
                   {/* Failure Diagnostic Alert */}
-                  <div className="bg-rose-500/5 border border-rose-500/20 p-5 rounded-2xl flex items-start gap-4">
-                    <div className="bg-rose-500/10 p-2.5 rounded-xl border border-rose-500/20 text-rose-400 shrink-0">
+                  <div className="bg-[var(--color-danger)]/5 border border-[var(--color-danger)]/20 p-5 rounded-2xl flex items-start gap-4">
+                    <div className="bg-[var(--color-danger)]/10 p-2.5 rounded-xl border border-[var(--color-danger)]/20 text-[var(--color-danger)] shrink-0">
                       <ShieldAlert className="w-5 h-5" />
                     </div>
                     <div className="space-y-1">
-                      <h4 className="text-sm font-bold text-rose-400">AI Failure Reason</h4>
-                      <p className="text-xs text-gray-300 leading-relaxed font-medium">
+                      <h4 className="text-sm font-bold text-[var(--color-danger)]">AI Failure Reason</h4>
+                      <p className="text-xs text-[var(--ink)] leading-relaxed font-medium">
                         {endpoint.statusCode === 403 
                           ? 'Authentication / Authorization mismatch. Server returned HTTP 403 Forbidden. The assigned scope or role permissions do not permit requests to this endpoint path.'
                           : endpoint.statusCode === 500
@@ -225,19 +226,19 @@ The endpoint **${endpoint.path}** returned 404 Not Found. The routing controller
                   </div>
 
                   {/* Suggested Fix Prompt Card */}
-                  <div className="bg-[#121215] border border-white/5 rounded-2xl overflow-hidden shadow-lg">
-                    <div className="px-5 py-4 border-b border-white/5 bg-white/[0.01] flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-amber-400">
+                  <div className="bg-[var(--surface-hover)] border border-[var(--outline)] rounded-2xl overflow-hidden shadow-lg">
+                    <div className="px-5 py-4 border-b border-[var(--outline)] bg-[var(--surface-hover)]/50 flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-[var(--color-warning)]">
                         <Zap className="w-4 h-4 fill-current" />
-                        <h4 className="text-xs font-bold uppercase tracking-wider text-gray-300">Suggested Fix Prompt</h4>
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--ink)]">Suggested Fix Prompt</h4>
                       </div>
                       <button
                         onClick={() => handleCopy(calculatedFix, 'suggestedFix')}
-                        className="text-xs text-gray-500 hover:text-gray-300 flex items-center gap-1.5 transition-colors"
+                        className="text-xs text-[var(--ink-muted)] hover:text-[var(--ink)] flex items-center gap-1.5 transition-colors"
                       >
                         {copiedStates['suggestedFix'] ? (
                           <>
-                            <Check className="w-3.5 h-3.5 text-emerald-400" />
+                            <Check className="w-3.5 h-3.5 text-[var(--color-success)]" />
                             Copied!
                           </>
                         ) : (
@@ -249,8 +250,8 @@ The endpoint **${endpoint.path}** returned 404 Not Found. The routing controller
                       </button>
                     </div>
 
-                    <div className="p-5 font-sans text-sm text-gray-300 leading-relaxed max-h-[350px] overflow-y-auto custom-scrollbar select-text bg-[#0a0a0c]">
-                      <pre className="whitespace-pre-wrap font-sans text-xs text-gray-400 leading-relaxed">
+                    <div className="p-5 font-sans text-sm text-[var(--ink)] leading-relaxed max-h-[350px] overflow-y-auto custom-scrollbar select-text bg-[var(--canvas)]">
+                      <pre className="whitespace-pre-wrap font-sans text-xs text-[var(--ink-muted)] leading-relaxed">
                         {calculatedFix}
                       </pre>
                     </div>
@@ -263,49 +264,49 @@ The endpoint **${endpoint.path}** returned 404 Not Found. The routing controller
                   {/* Request Payload */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between px-1">
-                      <h4 className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                      <h4 className="text-xs font-bold text-[var(--ink-muted)] uppercase tracking-widest flex items-center gap-2">
                         <Braces className="w-4 h-4" /> Request Body Details
                       </h4>
                       {endpoint.requestBody && (
                         <button
                           onClick={() => handleCopy(JSON.stringify(endpoint.requestBody, null, 2), 'reqBody')}
-                          className="text-xs text-gray-500 hover:text-gray-300 flex items-center gap-1 transition-colors"
+                          className="text-xs text-[var(--ink-muted)] hover:text-[var(--ink)] flex items-center gap-1 transition-colors"
                         >
-                          {copiedStates['reqBody'] ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                          {copiedStates['reqBody'] ? <Check className="w-3.5 h-3.5 text-[var(--color-success)]" /> : <Copy className="w-3.5 h-3.5" />}
                           Copy JSON
                         </button>
                       )}
                     </div>
-                    <div className="bg-[#0a0a0c] border border-white/5 rounded-xl p-4 overflow-x-auto custom-scrollbar">
+                    <div className="bg-[var(--canvas)] border border-[var(--outline)] rounded-xl p-4 overflow-x-auto custom-scrollbar">
                       {endpoint.requestBody ? (
-                        <pre className="text-xs font-mono text-emerald-400 leading-relaxed">
+                        <pre className="text-xs font-mono text-[var(--color-success)] leading-relaxed">
                           <code>{JSON.stringify(endpoint.requestBody, null, 2)}</code>
                         </pre>
                       ) : (
-                        <p className="text-xs text-gray-600 font-mono italic">No request body required.</p>
+                        <p className="text-xs text-[var(--ink-faint)] font-mono italic">No request body required.</p>
                       )}
                     </div>
                   </div>
 
                   {/* Schema Difference (Expected vs Received) */}
                   <div className="space-y-2">
-                    <h4 className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
-                      <Activity className="w-4 h-4 text-purple-400" /> Schema Diff Visualization
+                    <h4 className="text-xs font-bold text-[var(--ink-muted)] uppercase tracking-widest flex items-center gap-2">
+                      <Activity className="w-4 h-4 text-[var(--color-accent)]" /> Schema Diff Visualization
                     </h4>
-                    <div className="bg-[#0c0c0f] border border-purple-500/10 rounded-2xl p-5 space-y-4">
+                    <div className="bg-[var(--surface-hover)] border border-[var(--color-accent)]/10 rounded-2xl p-5 space-y-4">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-1.5">
-                          <span className="text-[10px] uppercase font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">Expected Schema</span>
-                          <div className="bg-[#060608] border border-white/5 p-3 rounded-xl max-h-[160px] overflow-y-auto custom-scrollbar">
-                            <pre className="text-[10px] font-mono text-gray-400 leading-normal">
+                          <span className="text-[10px] uppercase font-bold text-[var(--color-success)] bg-[var(--color-success)]/10 border border-[var(--color-success)]/20 px-2 py-0.5 rounded">Expected Schema</span>
+                          <div className="bg-[var(--canvas)] border border-[var(--outline)] p-3 rounded-xl max-h-[160px] overflow-y-auto custom-scrollbar">
+                            <pre className="text-[10px] font-mono text-[var(--ink-muted)] leading-normal">
                               {JSON.stringify(mockExpectedSchema, null, 2)}
                             </pre>
                           </div>
                         </div>
                         <div className="space-y-1.5">
-                          <span className="text-[10px] uppercase font-bold text-rose-400 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded">Received Payload</span>
-                          <div className="bg-[#060608] border border-white/5 p-3 rounded-xl max-h-[160px] overflow-y-auto custom-scrollbar">
-                            <pre className="text-[10px] font-mono text-rose-300 leading-normal">
+                          <span className="text-[10px] uppercase font-bold text-[var(--color-danger)] bg-[var(--color-danger)]/10 border border-[var(--color-danger)]/20 px-2 py-0.5 rounded">Received Payload</span>
+                          <div className="bg-[var(--canvas)] border border-[var(--outline)] p-3 rounded-xl max-h-[160px] overflow-y-auto custom-scrollbar">
+                            <pre className="text-[10px] font-mono text-[var(--color-danger)] leading-normal">
                               {JSON.stringify(mockResponsePayload, null, 2)}
                             </pre>
                           </div>
@@ -313,10 +314,10 @@ The endpoint **${endpoint.path}** returned 404 Not Found. The routing controller
                       </div>
                       
                       {/* Comparison Alert */}
-                      <div className="bg-[#15121c] border border-purple-500/20 p-3.5 rounded-xl flex items-start gap-2.5">
-                        <AlertCircle className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
-                        <div className="text-xs text-gray-300 leading-relaxed font-medium">
-                          <strong className="text-purple-400">Schema Mismatch:</strong> Expected root object key <code className="text-emerald-400 font-mono font-bold">success: true</code> but server responded with an error format structure enclosing status code <code className="text-rose-400 font-mono font-bold">{endpoint.statusCode || 500}</code>.
+                      <div className="bg-[var(--surface)] border border-[var(--color-accent)]/20 p-3.5 rounded-xl flex items-start gap-2.5">
+                        <AlertCircle className="w-4 h-4 text-[var(--color-accent)] shrink-0 mt-0.5" />
+                        <div className="text-xs text-[var(--ink)] leading-relaxed font-medium">
+                          <strong className="text-[var(--color-accent)]">Schema Mismatch:</strong> Expected root object key <code className="text-[var(--color-success)] font-mono font-bold">success: true</code> but server responded with an error format structure enclosing status code <code className="text-[var(--color-danger)] font-mono font-bold">{endpoint.statusCode || 500}</code>.
                         </div>
                       </div>
                     </div>
@@ -325,19 +326,19 @@ The endpoint **${endpoint.path}** returned 404 Not Found. The routing controller
                   {/* Response Payload */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between px-1">
-                      <h4 className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
-                        <Braces className="w-4 h-4 text-amber-500" /> Response Body Details
+                      <h4 className="text-xs font-bold text-[var(--ink-muted)] uppercase tracking-widest flex items-center gap-2">
+                        <Braces className="w-4 h-4 text-[var(--color-warning)]" /> Response Body Details
                       </h4>
                       <button
                         onClick={() => handleCopy(JSON.stringify(mockResponsePayload, null, 2), 'resBody')}
-                        className="text-xs text-gray-500 hover:text-gray-300 flex items-center gap-1 transition-colors"
+                        className="text-xs text-[var(--ink-muted)] hover:text-[var(--ink)] flex items-center gap-1 transition-colors"
                       >
-                        {copiedStates['resBody'] ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                        {copiedStates['resBody'] ? <Check className="w-3.5 h-3.5 text-[var(--color-success)]" /> : <Copy className="w-3.5 h-3.5" />}
                         Copy JSON
                       </button>
                     </div>
-                    <div className="bg-[#0a0a0c] border border-white/5 rounded-xl p-4 overflow-x-auto custom-scrollbar max-h-56">
-                      <pre className="text-xs font-mono text-amber-400/90 leading-relaxed">
+                    <div className="bg-[var(--canvas)] border border-[var(--outline)] rounded-xl p-4 overflow-x-auto custom-scrollbar max-h-56">
+                      <pre className="text-xs font-mono text-[var(--color-warning)] leading-relaxed">
                         <code>{JSON.stringify(mockResponsePayload, null, 2)}</code>
                       </pre>
                     </div>
@@ -348,30 +349,30 @@ The endpoint **${endpoint.path}** returned 404 Not Found. The routing controller
               {activeTab === 'logs' && (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between px-1">
-                    <h4 className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
-                      <Terminal className="w-4 h-4 text-emerald-500" /> API Execution Logs
+                    <h4 className="text-xs font-bold text-[var(--ink-muted)] uppercase tracking-widest flex items-center gap-2">
+                      <Terminal className="w-4 h-4 text-[var(--color-success)]" /> API Execution Logs
                     </h4>
-                    <span className="text-[10px] text-gray-500 uppercase font-mono">Isolated Request Thread</span>
+                    <span className="text-[10px] text-[var(--ink-muted)] uppercase font-mono">Isolated Request Thread</span>
                   </div>
 
-                  <div className="bg-[#050507] border border-white/5 rounded-2xl p-5 font-mono text-xs leading-relaxed space-y-3.5 shadow-inner">
+                  <div className="bg-[var(--canvas)] border border-[var(--outline)] rounded-2xl p-5 font-mono text-xs leading-relaxed space-y-3.5 shadow-inner">
                     {mockLogs.map((log, index) => {
-                      let typeColor = 'text-gray-500';
-                      let msgColor = 'text-gray-400';
+                      let typeColor = 'text-[var(--ink-muted)]';
+                      let msgColor = 'text-[var(--ink-muted)]';
                       if (log.type === 'success') {
-                        typeColor = 'text-emerald-500 font-bold';
-                        msgColor = 'text-emerald-400';
+                        typeColor = 'text-[var(--color-success)] font-bold';
+                        msgColor = 'text-[var(--color-success)]';
                       } else if (log.type === 'warning') {
-                        typeColor = 'text-amber-500 font-bold';
-                        msgColor = 'text-amber-400';
+                        typeColor = 'text-[var(--color-warning)] font-bold';
+                        msgColor = 'text-[var(--color-warning)]';
                       } else if (log.type === 'error') {
-                        typeColor = 'text-rose-500 font-bold';
-                        msgColor = 'text-rose-400 font-semibold';
+                        typeColor = 'text-[var(--color-danger)] font-bold';
+                        msgColor = 'text-[var(--color-danger)] font-semibold';
                       }
 
                       return (
                         <div key={index} className="flex items-start gap-4">
-                          <span className="text-gray-600 select-none shrink-0">[{log.time}]</span>
+                          <span className="text-[var(--ink-faint)] select-none shrink-0">[{log.time}]</span>
                           <span className={`${typeColor} shrink-0 select-none`}>{`[${log.type.toUpperCase()}]`}</span>
                           <span className={`${msgColor} break-all`}>{log.msg}</span>
                         </div>
@@ -383,10 +384,10 @@ The endpoint **${endpoint.path}** returned 404 Not Found. The routing controller
             </div>
 
             {/* Bottom Actions footer */}
-            <div className="p-4 border-t border-white/5 bg-white/[0.01] flex justify-end gap-3 shrink-0">
+            <div className="p-4 border-t border-[var(--outline)] bg-[var(--surface-hover)]/30 flex justify-end gap-3 shrink-0">
               <button
                 onClick={onClose}
-                className="px-5 py-2.5 rounded-xl text-xs font-bold text-gray-300 hover:text-white bg-white/5 hover:bg-white/10 transition-colors border border-white/5"
+                className="px-5 py-2.5 rounded-xl text-xs font-bold text-[var(--ink)] hover:text-white bg-[var(--surface)] hover:bg-[var(--surface-hover)] transition-colors border border-[var(--outline)]"
               >
                 Close Drawer
               </button>

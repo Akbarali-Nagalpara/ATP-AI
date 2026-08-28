@@ -52,7 +52,7 @@ export const CreateProjectModal = ({ isOpen, onClose }: { isOpen: boolean; onClo
             
             <form onSubmit={handleImport} className="p-6 space-y-4">
               {error && (
-                <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold leading-relaxed animate-fade-in">
+                <div className="p-4 rounded-xl bg-[var(--color-danger)]/10 border border-[var(--color-danger)]/20 text-[var(--color-danger)] text-xs font-semibold leading-relaxed animate-fade-in">
                   {error}
                 </div>
               )}
@@ -64,7 +64,7 @@ export const CreateProjectModal = ({ isOpen, onClose }: { isOpen: boolean; onClo
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Core API Service"
-                  className="w-full bg-[var(--surface-hover)] border border-[var(--outline)] rounded-xl px-4 py-2.5 text-[var(--ink)] placeholder-[var(--outline-strong)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-all"
+                  className="w-full bg-[var(--surface-hover)] border border-[var(--outline)] hover:border-[var(--outline-strong)] rounded-xl px-4 py-2.5 text-[var(--ink)] placeholder-[var(--ink-muted)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-all"
                   required
                 />
               </div>
@@ -73,14 +73,14 @@ export const CreateProjectModal = ({ isOpen, onClose }: { isOpen: boolean; onClo
                 <label className="text-sm font-medium text-[var(--ink-muted)]">Swagger URL</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <LinkIcon className="h-4 w-4 text-[var(--outline-strong)]" />
+                    <LinkIcon className="h-4 w-4 text-[var(--ink-muted)]" />
                   </div>
                   <input
                     type="url"
                     value={url}
                     onChange={(e) => setUrl(e.target.value)}
                     placeholder="https://api.example.com/swagger.json"
-                    className="w-full bg-[var(--surface-hover)] border border-[var(--outline)] rounded-xl pl-10 pr-4 py-2.5 text-[var(--ink)] placeholder-[var(--outline-strong)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-all"
+                    className="w-full bg-[var(--surface-hover)] border border-[var(--outline)] hover:border-[var(--outline-strong)] rounded-xl pl-10 pr-4 py-2.5 text-[var(--ink)] placeholder-[var(--ink-muted)] focus:outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)] transition-all"
                     required
                   />
                 </div>
@@ -97,7 +97,7 @@ export const CreateProjectModal = ({ isOpen, onClose }: { isOpen: boolean; onClo
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="flex items-center gap-2 bg-[var(--color-primary)] hover:opacity-90 disabled:opacity-70 text-white px-5 py-2 rounded-xl text-sm font-semibold transition-all shadow-md"
+                  className="flex items-center gap-2 bg-[var(--color-primary)] hover:opacity-90 disabled:opacity-70 text-[#080810] px-5 py-2 rounded-xl text-sm font-semibold transition-all shadow-[0_0_15px_rgba(0,229,160,0.15)]"
                 >
                   {isLoading ? (
                     <>

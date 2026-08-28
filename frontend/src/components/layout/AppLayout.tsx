@@ -22,9 +22,10 @@ export const AppLayout = () => {
   const theme = useAppStore(state => state.theme);
 
   React.useEffect(() => {
-    if (theme === 'dark') document.documentElement.classList.add('dark');
-    else document.documentElement.classList.remove('dark');
-  }, [theme]);
+    // Carbon Neon theme is always dark — force dark class at all times
+    document.documentElement.classList.add('dark');
+  }, []);
+
 
   return (
     <div className="flex h-screen bg-[var(--canvas)] text-[var(--ink)] overflow-hidden transition-colors duration-300">

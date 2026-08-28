@@ -25,7 +25,10 @@ export interface LogEntry {
 export interface AiInsight {
   endpoint: string;
   issue: string;
+  rootCause: string;
   suggestion: string;
+  fixPrompt: string;
+  securityFindings: string[];
 }
 
 export interface RoleToken {

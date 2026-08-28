@@ -88,16 +88,18 @@ export const RolesTokensModal = ({
                             )}
                           </td>
                           <td className="px-6 py-4 font-mono text-xs">
-                            {tokenObj.token ? (
-                              <div className="flex items-center gap-2">
-                                <Key className="w-3.5 h-3.5 text-[var(--color-warning)] shrink-0" />
-                                <span className="text-[var(--ink)] truncate max-w-[200px] sm:max-w-[300px] inline-block" title={tokenObj.token}>
-                                  {tokenObj.token}
-                                </span>
-                              </div>
-                            ) : (
-                              <span className="text-[var(--ink-muted)] italic">--</span>
-                            )}
+                            <div className="flex items-center gap-2">
+                              <Key className="w-3.5 h-3.5 text-[var(--color-warning)] shrink-0" />
+                              <input 
+                                type="text"
+                                placeholder="Paste JWT token..."
+                                value={tokenObj.token || ''}
+                                onChange={(e) => {
+                                  useAppStore.getState().updateToken(projectId, tokenObj.role, { token: e.target.value, status: e.target.value ? 'Authenticated' : 'Pending' });
+                                }}
+                                className="bg-[var(--canvas)] border border-[var(--outline)] rounded px-2 py-1 text-[11px] text-[var(--ink)] placeholder-[var(--ink-muted)] focus:outline-none focus:border-[var(--color-primary)] transition-colors w-full sm:w-64"
+                              />
+                            </div>
                           </td>
                         </tr>
                       ))}

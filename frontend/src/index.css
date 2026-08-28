@@ -1,24 +1,17 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-canvas: var(--canvas);
-  --color-surface: var(--surface);
-  --color-surface-hover: var(--surface-hover);
-  --color-outline: var(--outline);
-  --color-outline-strong: var(--outline-strong);
-  --color-ink: var(--ink);
-  --color-ink-muted: var(--ink-muted);
-
-  /* --color-primary: #f4ae00; */
-  --color-primary: #e01e37;
-  --color-success: #22C55E;
-  --color-danger: #EF4444;
-  --color-warning: #F59E0B;
-  --color-info: #0EA5E9;
+  --color-primary: #00E5A0;
+  --color-primary-dark: #00B87A;
+  --color-accent: #7B6FFF;
+  --color-success: #00E5A0;
+  --color-danger: #FF5A5A;
+  --color-warning: #FFB830;
+  --color-info: #38BDF8;
 }
 
 @layer base {
@@ -26,28 +19,59 @@
     --canvas: #F8FAFC;
     --surface: #FFFFFF;
     --surface-hover: #F1F5F9;
+    --surface-2: #E2E8F0;
     --outline: #E2E8F0;
     --outline-strong: #CBD5E1;
     --ink: #0F172A;
     --ink-muted: #475569;
+    --ink-faint: #94A3B8;
+    --color-primary: #00E5A0;
+    --color-primary-dark: #00B87A;
+    --color-accent: #7B6FFF;
+    --color-success: #059669; /* darker green for contrast in light mode */
+    --color-danger: #DC2626; /* darker red for contrast */
+    --color-warning: #D97706; /* darker amber */
+    --color-info: #0284C7; /* darker blue */
+
+    /* HTTP Methods */
+    --method-get: #0284C7;
+    --method-post: #059669;
+    --method-put: #D97706;
+    --method-patch: #7C3AED;
+    --method-delete: #DC2626;
   }
 
   .dark {
-    --canvas: #000000;
-    --surface: #0a0a0b;
-    --surface-hover: #111112;
-    --outline: #1e1e20;
-    --outline-strong: #333335;
-    --ink: #F8FAFC;
-    --ink-muted: #94A3B8;
+    --canvas: #0A0A0F;
+    --surface: #111118;
+    --surface-hover: #18181F;
+    --surface-2: #1E1E28;
+    --outline: #232330;
+    --outline-strong: #32324A;
+    --ink: #F0F0FF;
+    --ink-muted: #8888AA;
+    --ink-faint: #44445A;
+    --color-primary: #00E5A0;
+    --color-primary-dark: #00B87A;
+    --color-accent: #7B6FFF;
+    --color-success: #00E5A0;
+    --color-danger: #FF5A5A;
+    --color-warning: #FFB830;
+    --color-info: #38BDF8;
+
+    /* HTTP Methods */
+    --method-get: #38BDF8;
+    --method-post: #00E5A0;
+    --method-put: #F59E0B;
+    --method-patch: #A855F7;
+    --method-delete: #EF4444;
   }
 
-  * {
-    box-sizing: border-box;
-  }
+  * { box-sizing: border-box; }
 
   html {
     scroll-behavior: smooth;
+    color-scheme: dark;
   }
 
   body {
@@ -57,56 +81,130 @@
     color: var(--ink);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    transition: background-color 0.2s ease, color 0.2s ease;
   }
 
-  /* Custom scrollbar */
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: var(--outline-strong);
-    border-radius: 99px;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: var(--ink-muted);
-  }
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--outline-strong); border-radius: 99px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--ink-faint); }
 }
 
 @layer utilities {
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+  .font-mono { font-family: 'JetBrains Mono', 'Courier New', monospace !important; }
+
+  /* Teal → Violet gradient text */
+  .gradient-text {
+    background: linear-gradient(135deg, #00E5A0 0%, #7B6FFF 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+  /* Gradient border trick */
+  .gradient-border {
+    position: relative;
+  }
+  .gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, #00E5A0 0%, #7B6FFF 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0.5;
   }
 
-  /* Glass card effect */
-  .glass {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+  /* Teal solid button — text is dark for contrast */
+  .btn-primary {
+    background: #00E5A0;
+    color: #080810;
+    font-weight: 700;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #00E5A0 0%, #7B6FFF 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .btn-primary:hover::after { opacity: 1; }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 28px rgba(0,229,160,0.35); }
+  .btn-primary span, .btn-primary svg { position: relative; z-index: 1; }
+
+  /* Ghost button */
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--outline-strong);
+    color: var(--ink-muted);
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+  .btn-ghost:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    background: rgba(0, 229, 160, 0.06);
   }
 
-  .dark .glass {
-    background: rgba(30, 41, 59, 0.7);
+  /* Glows */
+  .glow-primary { box-shadow: 0 0 24px rgba(0, 229, 160, 0.25); }
+  .glow-accent  { box-shadow: 0 0 24px rgba(123, 111, 255, 0.25); }
+  .glow-danger  { box-shadow: 0 0 20px rgba(255, 90, 90, 0.25); }
+
+  /* Skeleton shimmer */
+  @keyframes shimmer {
+    0%   { background-position: -200% 0; }
+    100% { background-position:  200% 0; }
+  }
+  .skeleton {
+    background: linear-gradient(90deg, var(--outline) 25%, var(--outline-strong) 50%, var(--outline) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 6px;
   }
 
+  /* Running state pulse dot */
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.4; transform: scale(1.5); }
+  }
+  .pulse-dot { animation: pulse-dot 1.2s ease-in-out infinite; }
+
+  /* Blink cursor */
   @keyframes blink {
     0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
+    50%       { opacity: 0; }
+  }
+  .animate-blink { animation: blink 1s step-end infinite; }
+
+  /* Card hover lift */
+  .card-lift { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+  .card-lift:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 40px rgba(0, 229, 160, 0.08), 0 4px 16px rgba(0,0,0,0.5);
   }
 
-  .animate-blink {
-    animation: blink 1s step-end infinite;
+  /* Page enter */
+  @keyframes page-enter {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0);    }
   }
+  .page-enter { animation: page-enter 0.3s ease forwards; }
+
+  /* HTTP Method Badges */
+  .badge-method-get { color: var(--method-get); background: color-mix(in srgb, var(--method-get) 10%, transparent); border: 1px solid color-mix(in srgb, var(--method-get) 20%, transparent); }
+  .badge-method-post { color: var(--method-post); background: color-mix(in srgb, var(--method-post) 10%, transparent); border: 1px solid color-mix(in srgb, var(--method-post) 20%, transparent); }
+  .badge-method-put { color: var(--method-put); background: color-mix(in srgb, var(--method-put) 10%, transparent); border: 1px solid color-mix(in srgb, var(--method-put) 20%, transparent); }
+  .badge-method-patch { color: var(--method-patch); background: color-mix(in srgb, var(--method-patch) 10%, transparent); border: 1px solid color-mix(in srgb, var(--method-patch) 20%, transparent); }
+  .badge-method-delete { color: var(--method-delete); background: color-mix(in srgb, var(--method-delete) 10%, transparent); border: 1px solid color-mix(in srgb, var(--method-delete) 20%, transparent); }
 }

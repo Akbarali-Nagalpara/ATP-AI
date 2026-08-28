@@ -124,32 +124,32 @@ export const FailureTable: React.FC<FailureTableProps> = ({ endpoints, onInspect
   // Status Styling: 2xx Green, 4xx Orange, 5xx Red
   const getStatusBadgeStyles = (status: string, statusCode?: number) => {
     if (status === 'Pending' || status === 'Queued' || status === 'Running') {
-      return 'text-gray-400 bg-white/[0.03] border-white/10';
+      return 'text-[var(--ink-muted)] bg-[var(--surface-hover)] border-[var(--outline)]';
     }
     if (!statusCode) {
       return status === 'Pass' 
-        ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' 
-        : 'text-rose-400 bg-rose-500/10 border-rose-500/20';
+        ? 'text-[var(--color-success)] bg-[var(--color-success)]/10 border-[var(--color-success)]/20' 
+        : 'text-[var(--color-danger)] bg-[var(--color-danger)]/10 border-[var(--color-danger)]/20';
     }
 
     if (statusCode >= 200 && statusCode < 300) {
-      return 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20';
+      return 'text-[var(--color-success)] bg-[var(--color-success)]/10 border-[var(--color-success)]/20';
     } else if (statusCode >= 400 && statusCode < 500) {
-      return 'text-amber-400 bg-amber-500/10 border-amber-500/20';
+      return 'text-[var(--color-warning)] bg-[var(--color-warning)]/10 border-[var(--color-warning)]/20';
     } else if (statusCode >= 500) {
-      return 'text-rose-400 bg-rose-500/10 border-rose-500/20';
+      return 'text-[var(--color-danger)] bg-[var(--color-danger)]/10 border-[var(--color-danger)]/20';
     }
-    return 'text-blue-400 bg-blue-500/10 border-blue-500/20';
+    return 'text-[var(--color-info)] bg-[var(--color-info)]/10 border-[var(--color-info)]/20';
   };
 
   const getMethodBadgeStyles = (method: string) => {
     switch (method) {
-      case 'GET': return 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20';
-      case 'POST': return 'text-blue-400 bg-blue-500/10 border-blue-500/20';
-      case 'PUT': return 'text-orange-400 bg-orange-500/10 border-orange-500/20';
-      case 'DELETE': return 'text-rose-400 bg-rose-500/10 border-rose-500/20';
-      case 'PATCH': return 'text-purple-400 bg-purple-500/10 border-purple-500/20';
-      default: return 'text-gray-400 bg-gray-500/10 border-gray-500/20';
+      case 'GET': return 'badge-method-get';
+      case 'POST': return 'badge-method-post';
+      case 'PUT': return 'badge-method-put';
+      case 'DELETE': return 'badge-method-delete';
+      case 'PATCH': return 'badge-method-patch';
+      default: return 'text-[var(--ink-muted)] bg-[var(--surface-hover)] border-[var(--outline)]';
     }
   };
 
@@ -163,12 +163,12 @@ export const FailureTable: React.FC<FailureTableProps> = ({ endpoints, onInspect
   };
 
   return (
-    <div className="flex flex-col bg-[#0d0d0f]/60 backdrop-blur-xl border border-white/5 rounded-2xl overflow-hidden shadow-2xl transition-all duration-300">
+    <div className="flex flex-col bg-[var(--surface)] backdrop-blur-xl border border-[var(--outline)] rounded-2xl overflow-hidden shadow-2xl transition-all duration-300">
       {/* Control Bar: Search and Filters */}
-      <div className="p-5 border-b border-white/5 flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white/[0.01]">
+      <div className="p-5 border-b border-[var(--outline)] flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-[var(--surface-hover)]">
         {/* Search */}
         <div className="relative flex-1 max-w-lg">
-          <Search className="w-4 h-4 text-gray-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-[var(--ink-muted)] absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             placeholder="Search by path, status code, role..."
@@ -177,14 +177,14 @@ export const FailureTable: React.FC<FailureTableProps> = ({ endpoints, onInspect
               setSearchQuery(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full bg-[#121214] border border-white/5 rounded-xl pl-10 pr-4 py-2.5 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-white/10 transition-colors"
+            className="w-full bg-[var(--surface)] border border-[var(--outline)] hover:border-[var(--outline-strong)] rounded-xl pl-10 pr-4 py-2.5 text-sm text-[var(--ink)] placeholder-[var(--ink-muted)] focus:outline-none focus:border-[var(--color-primary)] transition-colors"
           />
         </div>
 
         {/* Filters */}
         <div className="flex flex-wrap items-center gap-3">
           {/* Method Filter */}
-          <div className="flex items-center gap-1.5 bg-[#121214] border border-white/5 px-3 py-1.5 rounded-xl text-xs text-gray-400">
+          <div className="flex items-center gap-1.5 bg-[var(--surface)] border border-[var(--outline)] px-3 py-1.5 rounded-xl text-xs text-[var(--ink-muted)]">
             <Filter className="w-3.5 h-3.5" />
             <select
               value={methodFilter}
@@ -192,19 +192,19 @@ export const FailureTable: React.FC<FailureTableProps> = ({ endpoints, onInspect
                 setMethodFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="bg-transparent border-none text-gray-300 focus:outline-none pr-2 cursor-pointer font-medium"
+              className="bg-transparent border-none text-[var(--ink)] focus:outline-none pr-2 cursor-pointer font-medium"
             >
-              <option value="ALL" className="bg-[#121214]">All Methods</option>
-              <option value="GET" className="bg-[#121214]">GET</option>
-              <option value="POST" className="bg-[#121214]">POST</option>
-              <option value="PUT" className="bg-[#121214]">PUT</option>
-              <option value="DELETE" className="bg-[#121214]">DELETE</option>
-              <option value="PATCH" className="bg-[#121214]">PATCH</option>
+              <option value="ALL" className="bg-[var(--surface)]">All Methods</option>
+              <option value="GET" className="bg-[var(--surface)]">GET</option>
+              <option value="POST" className="bg-[var(--surface)]">POST</option>
+              <option value="PUT" className="bg-[var(--surface)]">PUT</option>
+              <option value="DELETE" className="bg-[var(--surface)]">DELETE</option>
+              <option value="PATCH" className="bg-[var(--surface)]">PATCH</option>
             </select>
           </div>
 
           {/* Status Filter */}
-          <div className="flex items-center gap-1.5 bg-[#121214] border border-white/5 px-3 py-1.5 rounded-xl text-xs text-gray-400">
+          <div className="flex items-center gap-1.5 bg-[var(--surface)] border border-[var(--outline)] px-3 py-1.5 rounded-xl text-xs text-[var(--ink-muted)]">
             <CheckCircle className="w-3.5 h-3.5" />
             <select
               value={statusFilter}
@@ -212,16 +212,16 @@ export const FailureTable: React.FC<FailureTableProps> = ({ endpoints, onInspect
                 setStatusFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="bg-transparent border-none text-gray-300 focus:outline-none pr-2 cursor-pointer font-medium"
+              className="bg-transparent border-none text-[var(--ink)] focus:outline-none pr-2 cursor-pointer font-medium"
             >
-              <option value="ALL" className="bg-[#121214]">All Statuses</option>
-              <option value="Pass" className="bg-[#121214]">Passed (2xx)</option>
-              <option value="Fail" className="bg-[#121214]">Failed (4xx/5xx)</option>
+              <option value="ALL" className="bg-[var(--surface)]">All Statuses</option>
+              <option value="Pass" className="bg-[var(--surface)]">Passed (2xx)</option>
+              <option value="Fail" className="bg-[var(--surface)]">Failed (4xx/5xx)</option>
             </select>
           </div>
 
           {/* Role Filter */}
-          <div className="flex items-center gap-1.5 bg-[#121214] border border-white/5 px-3 py-1.5 rounded-xl text-xs text-gray-400">
+          <div className="flex items-center gap-1.5 bg-[var(--surface)] border border-[var(--outline)] px-3 py-1.5 rounded-xl text-xs text-[var(--ink-muted)]">
             <Shield className="w-3.5 h-3.5" />
             <select
               value={roleFilter}
@@ -229,10 +229,10 @@ export const FailureTable: React.FC<FailureTableProps> = ({ endpoints, onInspect
                 setRoleFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="bg-transparent border-none text-gray-300 focus:outline-none pr-2 cursor-pointer font-medium"
+              className="bg-transparent border-none text-[var(--ink)] focus:outline-none pr-2 cursor-pointer font-medium"
             >
               {uniqueRoles.map((role) => (
-                <option key={role} value={role} className="bg-[#121214]">
+                <option key={role} value={role} className="bg-[var(--surface)]">
                   {role === 'ALL' ? 'All Roles' : role}
                 </option>
               ))}
@@ -243,7 +243,7 @@ export const FailureTable: React.FC<FailureTableProps> = ({ endpoints, onInspect
           {(searchQuery || methodFilter !== 'ALL' || statusFilter !== 'ALL' || roleFilter !== 'ALL') && (
             <button
               onClick={handleResetFilters}
-              className="flex items-center gap-1.5 text-xs text-rose-400 hover:text-rose-300 bg-rose-500/10 border border-rose-500/20 px-3 py-2 rounded-xl transition-all"
+              className="flex items-center gap-1.5 text-xs text-[var(--color-danger)] hover:text-white bg-[var(--color-danger)]/10 hover:bg-[var(--color-danger)]/20 border border-[var(--color-danger)]/20 px-3 py-2 rounded-xl transition-all"
             >
               <RefreshCcw className="w-3.5 h-3.5 animate-spin-hover" />
               Reset
@@ -254,12 +254,12 @@ export const FailureTable: React.FC<FailureTableProps> = ({ endpoints, onInspect
 
       {/* Main Table */}
       <div className="flex-1 overflow-x-auto custom-scrollbar">
-        <table className="w-full text-left text-sm text-gray-400 border-collapse table-fixed min-w-[900px]">
-          <thead className="bg-[#101012] text-xs font-bold text-gray-500 uppercase tracking-widest border-b border-white/5 sticky top-0 z-10">
+        <table className="w-full text-left text-sm text-[var(--ink-muted)] border-collapse table-fixed min-w-[900px]">
+          <thead className="bg-[var(--surface)] text-[11px] font-bold text-[var(--ink-muted)] uppercase tracking-widest border-b border-[var(--outline)] sticky top-0 z-10">
             <tr>
               <th className="w-[50px] px-6 py-4"></th>
               <th 
-                className="w-[120px] px-6 py-4 cursor-pointer hover:text-gray-300 transition-colors select-none"
+                className="w-[120px] px-6 py-4 cursor-pointer hover:text-[var(--ink)] transition-colors select-none"
                 onClick={() => handleSort('method')}
               >
                 <div className="flex items-center gap-1">
@@ -268,7 +268,7 @@ export const FailureTable: React.FC<FailureTableProps> = ({ endpoints, onInspect
                 </div>
               </th>
               <th 
-                className="px-6 py-4 cursor-pointer hover:text-gray-300 transition-colors select-none"
+                className="px-6 py-4 cursor-pointer hover:text-[var(--ink)] transition-colors select-none"
                 onClick={() => handleSort('path')}
               >
                 <div className="flex items-center gap-1">
@@ -277,7 +277,7 @@ export const FailureTable: React.FC<FailureTableProps> = ({ endpoints, onInspect
                 </div>
               </th>
               <th 
-                className="w-[180px] px-6 py-4 cursor-pointer hover:text-gray-300 transition-colors select-none"
+                className="w-[180px] px-6 py-4 cursor-pointer hover:text-[var(--ink)] transition-colors select-none"
                 onClick={() => handleSort('role')}
               >
                 <div className="flex items-center gap-1">
@@ -286,7 +286,7 @@ export const FailureTable: React.FC<FailureTableProps> = ({ endpoints, onInspect
                 </div>
               </th>
               <th 
-                className="w-[120px] px-6 py-4 cursor-pointer hover:text-gray-300 transition-colors select-none"
+                className="w-[120px] px-6 py-4 cursor-pointer hover:text-[var(--ink)] transition-colors select-none"
                 onClick={() => handleSort('statusCode')}
               >
                 <div className="flex items-center gap-1">
@@ -295,7 +295,7 @@ export const FailureTable: React.FC<FailureTableProps> = ({ endpoints, onInspect
                 </div>
               </th>
               <th 
-                className="w-[120px] px-6 py-4 cursor-pointer hover:text-gray-300 transition-colors select-none"
+                className="w-[120px] px-6 py-4 cursor-pointer hover:text-[var(--ink)] transition-colors select-none"
                 onClick={() => handleSort('responseTime')}
               >
                 <div className="flex items-center gap-1">
@@ -307,7 +307,7 @@ export const FailureTable: React.FC<FailureTableProps> = ({ endpoints, onInspect
             </tr>
           </thead>
           
-          <tbody className="divide-y divide-white/5">
+          <tbody className="divide-y divide-[var(--outline)]">
             {paginatedEndpoints.map((ep) => {
               const isExpanded = !!expandedRows[ep.id];
               const isFailed = ep.status === 'Fail';
@@ -327,11 +327,11 @@ export const FailureTable: React.FC<FailureTableProps> = ({ endpoints, onInspect
               return (
                 <React.Fragment key={ep.id}>
                   {/* Standard Row */}
-                  <tr className={`hover:bg-white/[0.02] transition-colors duration-150 group ${isExpanded ? 'bg-white/[0.01]' : ''}`}>
+                  <tr className={`hover:bg-[var(--surface-hover)] transition-colors duration-150 group ${isExpanded ? 'bg-[var(--surface-hover)]' : ''}`}>
                     <td className="px-6 py-4 text-center">
                       <button 
                         onClick={() => toggleRow(ep.id)}
-                        className="p-1 hover:bg-white/10 rounded-lg text-gray-500 hover:text-gray-300 transition-colors"
+                        className="p-1 hover:bg-[var(--outline)] rounded-lg text-[var(--ink-muted)] hover:text-[var(--ink)] transition-colors"
                       >
                         {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
                       </button>
@@ -341,12 +341,12 @@ export const FailureTable: React.FC<FailureTableProps> = ({ endpoints, onInspect
                         {ep.method}
                       </span>
                     </td>
-                    <td className="px-6 py-4 font-mono text-[13px] text-gray-300 truncate" title={ep.path}>
+                    <td className="px-6 py-4 font-mono text-[13px] text-[var(--ink)] truncate" title={ep.path}>
                       {ep.path}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="inline-flex items-center gap-1.5 text-xs text-gray-400 bg-white/[0.03] border border-white/5 px-2.5 py-1 rounded-lg">
-                        <Shield className="w-3 h-3 text-amber-500" />
+                      <span className="inline-flex items-center gap-1.5 text-xs text-[var(--ink-muted)] bg-[var(--surface-hover)] border border-[var(--outline)] px-2.5 py-1 rounded-lg">
+                        <Shield className="w-3 h-3 text-[var(--color-warning)]" />
                         {ep.role}
                       </span>
                     </td>
@@ -362,10 +362,10 @@ export const FailureTable: React.FC<FailureTableProps> = ({ endpoints, onInspect
                         {ep.statusCode || ep.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-xs font-mono text-gray-400">
+                    <td className="px-6 py-4 whitespace-nowrap text-xs font-mono text-[var(--ink-muted)]">
                       {ep.responseTime ? (
                         <div className="flex items-center gap-1">
-                          <Clock className="w-3.5 h-3.5 text-gray-500" />
+                          <Clock className="w-3.5 h-3.5 text-[var(--ink-muted)]" />
                           {ep.responseTime}ms
                         </div>
                       ) : (
@@ -375,7 +375,7 @@ export const FailureTable: React.FC<FailureTableProps> = ({ endpoints, onInspect
                     <td className="px-6 py-4 text-right whitespace-nowrap">
                       <button
                         onClick={() => onInspect(ep)}
-                        className="inline-flex items-center gap-1.5 bg-[#121214] border border-white/5 hover:bg-white/5 text-gray-300 hover:text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-all shadow-sm"
+                        className="inline-flex items-center gap-1.5 bg-[var(--surface-hover)] border border-[var(--outline)] hover:bg-[var(--outline)] text-[var(--ink-muted)] hover:text-[var(--ink)] px-3 py-1.5 rounded-lg text-xs font-semibold transition-all shadow-sm"
                       >
                         <Eye className="w-3.5 h-3.5" />
                         Inspect
@@ -393,16 +393,16 @@ export const FailureTable: React.FC<FailureTableProps> = ({ endpoints, onInspect
                             animate={{ opacity: 1, height: 'auto' }}
                             exit={{ opacity: 0, height: 0 }}
                             transition={{ duration: 0.2, ease: 'easeInOut' }}
-                            className="overflow-hidden bg-[#0a0a0c]/60 border-l-2 border-rose-500/40"
+                            className="overflow-hidden bg-[var(--surface)] border-l-2 border-[var(--color-danger)]"
                           >
                             <div className="px-16 py-5 space-y-4">
                               <div className="flex flex-col md:flex-row gap-5 items-start justify-between">
                                 <div className="space-y-1.5 flex-1">
-                                  <h5 className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center gap-1.5">
-                                    <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
+                                  <h5 className="text-xs font-bold text-[var(--ink-muted)] uppercase tracking-widest flex items-center gap-1.5">
+                                    <AlertTriangle className="w-3.5 h-3.5 text-[var(--color-danger)]" />
                                     Failure Diagnosis
                                   </h5>
-                                  <p className="text-sm text-gray-300 leading-relaxed font-medium">
+                                  <p className="text-sm text-[var(--ink)] leading-relaxed font-medium">
                                     {failureReason}
                                   </p>
                                 </div>
@@ -411,7 +411,7 @@ export const FailureTable: React.FC<FailureTableProps> = ({ endpoints, onInspect
                                   <div className="shrink-0 flex items-center gap-3">
                                     <button
                                       onClick={() => onInspect(ep)}
-                                      className="px-4 py-2 rounded-xl text-xs font-bold text-indigo-400 hover:text-indigo-300 bg-indigo-500/10 border border-indigo-500/20 hover:border-indigo-500/40 transition-colors"
+                                      className="px-4 py-2 rounded-xl text-xs font-bold text-[var(--color-accent)] hover:text-white bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 hover:border-[var(--color-accent)]/40 transition-colors"
                                     >
                                       Inspect AI Suggestions
                                     </button>
@@ -432,12 +432,12 @@ export const FailureTable: React.FC<FailureTableProps> = ({ endpoints, onInspect
 
         {/* Empty State */}
         {totalItems === 0 && (
-          <div className="flex flex-col items-center justify-center py-20 text-gray-500">
-            <HelpCircle className="w-12 h-12 mb-3 opacity-20 text-gray-400" />
-            <p className="font-semibold text-gray-400">No endpoints found matching filters.</p>
+          <div className="flex flex-col items-center justify-center py-20 text-[var(--ink-muted)]">
+            <HelpCircle className="w-12 h-12 mb-3 opacity-20 text-[var(--ink-muted)]" />
+            <p className="font-semibold text-[var(--ink-muted)]">No endpoints found matching filters.</p>
             <button 
               onClick={handleResetFilters}
-              className="mt-3 text-[#e32636] hover:underline text-xs font-medium"
+              className="mt-3 text-[var(--color-primary)] hover:underline text-xs font-medium"
             >
               Clear filters and search
             </button>
@@ -447,27 +447,27 @@ export const FailureTable: React.FC<FailureTableProps> = ({ endpoints, onInspect
 
       {/* Pagination Footer */}
       {totalItems > 0 && (
-        <div className="px-6 py-4 border-t border-white/5 flex items-center justify-between text-xs text-gray-400 bg-white/[0.005]">
+        <div className="px-6 py-4 border-t border-[var(--outline)] flex items-center justify-between text-xs text-[var(--ink-muted)] bg-[var(--surface-hover)]/30">
           <div className="flex items-center gap-4">
             <span>
-              Showing <strong className="text-gray-200">{Math.min(totalItems, (currentPageSafe - 1) * pageSize + 1)}</strong> to{' '}
-              <strong className="text-gray-200">{Math.min(totalItems, currentPageSafe * pageSize)}</strong> of{' '}
-              <strong className="text-gray-200">{totalItems}</strong> entries
+              Showing <strong className="text-[var(--ink)]">{Math.min(totalItems, (currentPageSafe - 1) * pageSize + 1)}</strong> to{' '}
+              <strong className="text-[var(--ink)]">{Math.min(totalItems, currentPageSafe * pageSize)}</strong> of{' '}
+              <strong className="text-[var(--ink)]">{totalItems}</strong> entries
             </span>
-            <div className="flex items-center gap-1.5 bg-[#121214] border border-white/5 px-2 py-1 rounded-lg">
-              <span className="text-[10px] text-gray-500">Show:</span>
+            <div className="flex items-center gap-1.5 bg-[var(--surface)] border border-[var(--outline)] px-2 py-1 rounded-lg">
+              <span className="text-[10px] text-[var(--ink-muted)]">Show:</span>
               <select
                 value={pageSize}
                 onChange={(e) => {
                   setPageSize(Number(e.target.value));
                   setCurrentPage(1);
                 }}
-                className="bg-transparent border-none text-gray-300 focus:outline-none cursor-pointer font-bold"
+                className="bg-transparent border-none text-[var(--ink)] focus:outline-none cursor-pointer font-bold"
               >
-                <option value="5" className="bg-[#121214]">5</option>
-                <option value="10" className="bg-[#121214]">10</option>
-                <option value="20" className="bg-[#121214]">20</option>
-                <option value="50" className="bg-[#121214]">50</option>
+                <option value="5" className="bg-[var(--surface)]">5</option>
+                <option value="10" className="bg-[var(--surface)]">10</option>
+                <option value="20" className="bg-[var(--surface)]">20</option>
+                <option value="50" className="bg-[var(--surface)]">50</option>
               </select>
             </div>
           </div>
@@ -476,7 +476,7 @@ export const FailureTable: React.FC<FailureTableProps> = ({ endpoints, onInspect
             <button
               onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
               disabled={currentPageSafe === 1}
-              className="p-2 bg-[#121214] border border-white/5 rounded-xl text-gray-400 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed hover:bg-white/5 transition-colors"
+              className="p-2 bg-[var(--surface)] border border-[var(--outline)] rounded-xl text-[var(--ink-muted)] hover:text-[var(--ink)] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[var(--surface-hover)] transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -488,7 +488,7 @@ export const FailureTable: React.FC<FailureTableProps> = ({ endpoints, onInspect
               // Limit visible page numbers
               if (totalPages > 5 && Math.abs(pageNum - currentPageSafe) > 1 && pageNum !== 1 && pageNum !== totalPages) {
                 if (pageNum === 2 || pageNum === totalPages - 1) {
-                  return <span key={pageNum} className="px-1 text-gray-600">...</span>;
+                  return <span key={pageNum} className="px-1 text-[var(--ink-muted)]">...</span>;
                 }
                 return null;
               }
@@ -499,8 +499,8 @@ export const FailureTable: React.FC<FailureTableProps> = ({ endpoints, onInspect
                   onClick={() => setCurrentPage(pageNum)}
                   className={`px-3 py-1.5 rounded-xl font-bold transition-all text-xs ${
                     isSelected
-                      ? 'bg-[var(--color-primary)] text-white shadow-lg'
-                      : 'bg-[#121214] border border-white/5 text-gray-400 hover:bg-white/5 hover:text-white'
+                      ? 'bg-[var(--color-primary)] text-[#080810] shadow-md'
+                      : 'bg-[var(--surface)] border border-[var(--outline)] text-[var(--ink-muted)] hover:bg-[var(--surface-hover)] hover:text-[var(--ink)]'
                   }`}
                 >
                   {pageNum}
@@ -511,7 +511,7 @@ export const FailureTable: React.FC<FailureTableProps> = ({ endpoints, onInspect
             <button
               onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
               disabled={currentPageSafe === totalPages}
-              className="p-2 bg-[#121214] border border-white/5 rounded-xl text-gray-400 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed hover:bg-white/5 transition-colors"
+              className="p-2 bg-[var(--surface)] border border-[var(--outline)] rounded-xl text-[var(--ink-muted)] hover:text-[var(--ink)] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[var(--surface-hover)] transition-colors"
             >
               <ChevronRight className="w-4 h-4" />
             </button>

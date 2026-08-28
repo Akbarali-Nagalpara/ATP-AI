@@ -58,14 +58,14 @@ export const Login = () => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row h-screen bg-[#050505] overflow-hidden">
+    <div className="flex flex-col lg:flex-row h-screen overflow-hidden" style={{ background: 'var(--canvas)' }}>
       {/* Left Side: Simulation */}
       <div className="hidden lg:block lg:w-3/5 h-full relative">
         <AuthSimulation />
       </div>
 
       {/* Right Side: Auth Form */}
-      <div className="w-full lg:w-2/5 h-full flex flex-col items-center justify-center p-8 lg:p-16 relative bg-[#08080a] border-l border-[#111]">
+      <div className="w-full lg:w-2/5 h-full flex flex-col items-center justify-center p-8 lg:p-14 relative border-l" style={{ background: 'var(--surface)', borderColor: 'var(--outline)' }}>
         {/* Mobile Simulation Placeholder */}
         <div className="lg:hidden absolute top-0 left-0 w-full h-1/3 opacity-30 pointer-events-none">
           <AuthSimulation />
@@ -78,18 +78,13 @@ export const Login = () => {
         >
           {/* Header */}
           <div className="mb-8 text-center lg:text-left">
-            <div className="flex items-center justify-center lg:justify-start gap-3 mb-6">
-              <div className="w-12 h-12 rounded-2xl bg-transparent flex items-center justify-center">
-                <img src="/Endpoint%20IQ.png" alt="Logo" className="w-full h-full object-contain drop-shadow-xl" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-black text-white tracking-tighter">Endpoint IQ</h1>
-                <p className="text-[10px] text-[var(--color-primary)] font-bold tracking-[0.3em] uppercase leading-none">Testing Platform</p>
-              </div>
+            <div className="flex items-center justify-center lg:justify-start mb-6">
+              <img src="/Main_Logo.png" alt="Endpoint IQ Logo" className="w-80 max-w-none object-contain block dark:hidden" />
+              <img src="/main_Logo_Dark.png" alt="Endpoint IQ Logo" className="w-80 max-w-none object-contain hidden dark:block" />
             </div>
-            <h2 className="text-2xl font-bold text-white mb-2">Initialize Workspace</h2>
-            <p className="text-gray-500 text-sm leading-relaxed">
-              AI-Driven API Testing Platform. Automate Swagger-based testing with intelligent workflows.
+            <h2 className="text-2xl font-bold text-[var(--ink)] mb-2">Welcome back</h2>
+            <p className="text-[var(--ink-muted)] text-sm leading-relaxed">
+              Sign in to your workspace to continue testing your APIs.
             </p>
           </div>
 
@@ -98,47 +93,45 @@ export const Login = () => {
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-6 p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold leading-relaxed text-center lg:text-left"
+              className="mb-5 p-3.5 rounded-xl bg-[var(--color-danger)]/10 border border-[var(--color-danger)]/20 text-[var(--color-danger)] text-xs font-semibold leading-relaxed"
             >
               {error}
             </motion.div>
           )}
 
           {/* Login Form */}
-          <form onSubmit={handleLogin} className="space-y-5">
-            <div className="space-y-2">
-              <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest ml-1">Email Endpoint</label>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-bold text-[var(--ink-muted)] uppercase tracking-widest ml-1">Email</label>
               <div className="relative group">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 group-focus-within:text-[var(--color-primary)] transition-colors" />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--ink-faint)] group-focus-within:text-[var(--color-primary)] transition-colors" />
                 <input
                   type="email"
                   required
-                  placeholder="admin@atp.ai"
+                  placeholder="you@company.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-[#0d0d10] border border-[#222] focus:border-[var(--color-primary)]/50 rounded-2xl py-4 pl-12 pr-4 text-sm text-white placeholder-gray-700 transition-all outline-none"
+                  className="w-full bg-[var(--surface-hover)] border border-[var(--outline)] focus:border-[var(--color-primary)]/60 focus:ring-2 focus:ring-[var(--color-primary)]/10 rounded-xl py-3.5 pl-11 pr-4 text-sm text-[var(--ink)] placeholder-[var(--ink-faint)] transition-all outline-none"
                 />
               </div>
             </div>
 
-            <div className="space-y-2">
-              <div className="flex items-center justify-between ml-1">
-                <label className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">Secret Key</label>
-              </div>
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-bold text-[var(--ink-muted)] uppercase tracking-widest ml-1">Password</label>
               <div className="relative group">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600 group-focus-within:text-[var(--color-primary)] transition-colors" />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--ink-faint)] group-focus-within:text-[var(--color-primary)] transition-colors" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   required
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-[#0d0d10] border border-[#222] focus:border-[var(--color-primary)]/50 rounded-2xl py-4 pl-12 pr-12 text-sm text-white placeholder-gray-700 transition-all outline-none"
+                  className="w-full bg-[var(--surface-hover)] border border-[var(--outline)] focus:border-[var(--color-primary)]/60 focus:ring-2 focus:ring-[var(--color-primary)]/10 rounded-xl py-3.5 pl-11 pr-12 text-sm text-[var(--ink)] placeholder-[var(--ink-faint)] transition-all outline-none"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 hover:text-white transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--ink-faint)] hover:text-[var(--ink)] transition-colors"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -148,36 +141,40 @@ export const Login = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-[var(--color-primary)] hover:opacity-90 disabled:opacity-50 text-white font-bold py-4 rounded-2xl transition-all shadow-xl shadow-[var(--color-primary)]/20 flex items-center justify-center gap-3 group overflow-hidden relative"
+              className="w-full btn-primary disabled:opacity-50 text-white font-bold py-3.5 rounded-xl transition-all flex items-center justify-center gap-3 group mt-2"
             >
               {isLoading ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  <span className="font-mono text-sm tracking-tighter">{loadingText}</span>
+                  <span className="text-sm tracking-tight font-mono">{loadingText}</span>
                 </>
               ) : (
                 <>
-                  <span className="z-10">Initialize Workspace</span>
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform z-10" />
-                  <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[0%] transition-transform duration-500" />
+                  <span>Sign In</span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </>
               )}
             </button>
           </form>
 
-          {/* Footer */}
-          <p className="mt-10 text-center text-sm text-gray-500 font-medium">
-            New to Endpoint IQ?{' '}
-            <Link to="/signup" className="text-[var(--color-primary)] font-bold hover:underline">
-              Create AI Testing Workspace
-            </Link>
-          </p>
+          {/* Divider */}
+          <div className="flex items-center gap-3 mt-6">
+            <div className="flex-1 h-px bg-[var(--outline)]" />
+            <span className="text-[11px] text-[var(--ink-faint)] font-medium">New to Endpoint IQ?</span>
+            <div className="flex-1 h-px bg-[var(--outline)]" />
+          </div>
+          <Link
+            to="/signup"
+            className="mt-3 w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-[var(--outline)] text-[var(--ink-muted)] hover:text-[var(--ink)] hover:border-[var(--outline-strong)] hover:bg-[var(--surface-hover)] text-sm font-semibold transition-all"
+          >
+            Create a workspace
+          </Link>
         </motion.div>
 
-        {/* Decorative elements */}
-        <div className="absolute bottom-8 right-8 flex items-center gap-2">
-          <Shield className="w-4 h-4 text-emerald-500" />
-          <span className="text-[10px] font-mono text-gray-600">Secure AI Environment v2.4.0</span>
+        {/* Decorative bottom badge */}
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2">
+          <Shield className="w-3.5 h-3.5 text-[var(--color-success)]" />
+          <span className="text-[10px] font-mono text-[var(--ink-faint)]">Secured by Endpoint IQ v2.4</span>
         </div>
       </div>
     </div>
